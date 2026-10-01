@@ -27,6 +27,14 @@ def choice(label="continue", probability=0.95):
                               "confidence": 0.01}}, "usage": {"cost": 0.001}}
 
 
+def call_cli(args, payload):
+    output, errors = io.StringIO(), io.StringIO()
+    with patch("sys.stdin", io.StringIO(json.dumps(payload))), \
+            contextlib.redirect_stdout(output), contextlib.redirect_stderr(errors):
+        code = jev.main(args)
+    return code, output.getvalue(), errors.getvalue()
+
+
 class RequestTests(unittest.TestCase):
     def test_all_types(self):
         for kind in ["choice", "score", "noul"]:
@@ -189,15 +197,9 @@ class CLITests(unittest.TestCase):
         self.assertEqual(stopped.exception.code, 1)
         self.assertIn("error", json.loads(errors.getvalue()))
 
-    def call(self, args, payload):
-        output, errors = io.StringIO(), io.StringIO()
-        with patch("sys.stdin", io.StringIO(json.dumps(payload))), contextlib.redirect_stdout(output), contextlib.redirect_stderr(errors):
-            code = jev.main(args)
-        return code, output.getvalue(), errors.getvalue()
-
     def test_dry_run_never_calls_network(self):
         with patch("jev.request_decisions") as api:
-            code, output, _ = self.call(["decide", "-", "--dry-run"], request())
+            code, output, _ = call_cli(["decide", "-", "--dry-run"], request())
             self.assertEqual(code, 0)
             self.assertEqual(json.loads(output), request())
             api.assert_not_called()
@@ -207,7 +209,7 @@ class CLITests(unittest.TestCase):
             with self.subTest(environment=environment), \
                     patch.dict(os.environ, environment, clear=True), \
                     patch("jev.urllib.request.build_opener") as opener:
-                code, output, errors = self.call(["decide", "-"], request())
+                code, output, errors = call_cli(["decide", "-"], request())
                 self.assertEqual(code, 1)
                 self.assertEqual(output, "")
                 self.assertIn("OPENROUTER_API_KEY", json.loads(errors)["error"])
@@ -215,21 +217,120 @@ class CLITests(unittest.TestCase):
 
     def test_bad_threshold_no_spend(self):
         with patch("jev.request_decisions") as api:
-            code, _, _ = self.call(["decide", "-", "--min-probability", "nan"], request())
+            code, _, _ = call_cli(["decide", "-", "--min-probability", "nan"], request())
             self.assertEqual(code, 1)
             api.assert_not_called()
 
     def test_exit_review(self):
         with patch("jev.request_decisions", return_value=choice(probability=0.6)):
-            code, output, _ = self.call(["decide", "-"], request())
+            code, output, _ = call_cli(["decide", "-"], request())
             self.assertEqual(code, 2)
             self.assertEqual(json.loads(output)["decisions"]["q"]["status"], "needs_review")
 
     def test_empty_request(self):
-        code, output, errors = self.call(["decide", "-"], [])
+        code, output, errors = call_cli(["decide", "-"], [])
         self.assertEqual(code, 1)
         self.assertEqual(output, "")
         self.assertIn("error", json.loads(errors))
+
+
+class NeoHorseTests(unittest.TestCase):
+    """The fork's default real route: NeoHorse-Jev-4B on tokenrhythm.studio."""
+
+    def test_dry_run_maps_bundled_model_id(self):
+        with patch("jev.request_decisions") as api:
+            code, output, _ = call_cli(["decide", "-", "--provider", "neohorse", "--dry-run"], request())
+            self.assertEqual(code, 0)
+            self.assertEqual(json.loads(output)["model"], jev.NEOHORSE_MODEL)
+            api.assert_not_called()
+
+    def test_bundled_model_id_mapped_on_live_path(self):
+        with patch("jev.request_decisions", return_value=choice()) as api:
+            call_cli(["decide", "-", "--provider", "neohorse"], request())
+            self.assertEqual(api.call_args.args[0]["model"], jev.NEOHORSE_MODEL)
+
+    def test_model_override_is_never_rewritten(self):
+        payload = request()
+        payload["model"] = "custom-model"
+        with patch("jev.request_decisions", return_value=choice()) as api:
+            call_cli(["decide", "-", "--provider", "neohorse"], payload)
+            self.assertEqual(api.call_args.args[0]["model"], "custom-model")
+        code, output, _ = call_cli(["decide", "-", "--provider", "neohorse", "--dry-run"], payload)
+        self.assertEqual(json.loads(output)["model"], "custom-model")
+
+    def test_missing_key_before_network(self):
+        with patch.dict(os.environ, {}, clear=True), patch("jev.urllib.request.build_opener") as opener:
+            with self.assertRaises(jev.JevError) as error:
+                jev.request_decisions(request(), provider="neohorse")
+            self.assertIn("NEO_HORSE_API_KEY", str(error.exception))
+            opener.assert_not_called()
+
+    def test_uses_documented_endpoint_without_openrouter_header(self):
+        with patch.dict(os.environ, {"NEO_HORSE_API_KEY": "secret-test"}), \
+                patch("jev.check_public_endpoint"), \
+                patch("jev.urllib.request.build_opener") as opener:
+            response = opener.return_value.open.return_value.__enter__.return_value
+            response.read.return_value = json.dumps(choice()).encode()
+            jev.request_decisions(request(), provider="neohorse")
+            sent = opener.return_value.open.call_args.args[0]
+            self.assertEqual(sent.full_url, jev.NEOHORSE_URL)
+            self.assertEqual(sent.get_header("Authorization"), "Bearer secret-test")
+            self.assertIsNone(sent.get_header("X-openrouter-title"))
+
+    def test_unknown_provider_rejected(self):
+        with self.assertRaises(jev.JevError):
+            jev.request_decisions(request(), provider="untrusted")
+
+    def test_guard_rejects_non_https_and_foreign_host(self):
+        for url in ["http://tokenrhythm.studio/v1/decision", "https://untrusted.example/",
+                    "https://tokenrhythm.studio.evil.example/v1/decision"]:
+            with self.subTest(url=url), self.assertRaises(jev.JevError):
+                jev.check_public_endpoint(url)
+
+    def test_guard_rejects_private_resolution(self):
+        for address in ["127.0.0.1", "10.0.0.5", "192.168.1.10", "169.254.169.254", "::1", "fd00::1"]:
+            with self.subTest(address=address), \
+                    patch("jev.socket.getaddrinfo", return_value=[(2, 1, 6, "", (address, 443))]):
+                with self.assertRaisesRegex(jev.JevError, "blocked address"):
+                    jev.check_public_endpoint(jev.NEOHORSE_URL)
+
+    def test_guard_accepts_public_resolution(self):
+        with patch("jev.socket.getaddrinfo", return_value=[(2, 1, 6, "", ("93.184.216.34", 443))]):
+            jev.check_public_endpoint(jev.NEOHORSE_URL)
+
+    def test_guard_blocks_request_before_network(self):
+        with patch.dict(os.environ, {"NEO_HORSE_API_KEY": "secret-test"}), \
+                patch("jev.socket.getaddrinfo", return_value=[(2, 1, 6, "", ("127.0.0.1", 443))]), \
+                patch("jev.urllib.request.build_opener") as opener:
+            with self.assertRaises(jev.JevError):
+                jev.request_decisions(request(), provider="neohorse")
+            opener.assert_not_called()
+
+    def test_setup_reports_presence_only(self):
+        with patch.dict(os.environ, {"NEO_HORSE_API_KEY": "secret-test"}, clear=True):
+            report = jev.setup_report()
+        self.assertEqual(report["available"], {"openrouter": False, "typesafe": False, "neohorse": True})
+        self.assertNotIn("secret-test", json.dumps(report))
+
+    def test_documented_reduced_answer_shapes_accepted(self):
+        payload = {"model": jev.NEOHORSE_MODEL, "state": {"evidence": "Synthetic"}, "questions": {
+            "route": {"type": "choice", "instructions": "Pick a route.", "criteria": {"a": "Route A", "b": "Route B"}},
+            "stop": {"type": "noul", "instructions": "Should we stop?"},
+            "risk": {"type": "score", "instructions": "Rate the risk.", "criteria": ["Low", "High"]}}}
+        response = {"answers": {
+            "route": {"choice": "a", "probabilities": {"a": 0.9, "b": 0.1}},
+            "stop": {"noul": 0.2},
+            "risk": {"score": 1}}}
+        report = jev.build_report(payload, response, provider="neohorse")
+        self.assertEqual(report["decisions"]["route"]["value"], "a")
+        self.assertFalse(report["decisions"]["stop"]["value"])
+        self.assertEqual(report["decisions"]["risk"]["value"], 1)
+
+    def test_other_providers_still_require_full_answer_shape(self):
+        payload = {"model": jev.DEFAULT_MODEL, "state": {"evidence": "Synthetic"}, "questions": {
+            "risk": {"type": "score", "instructions": "Rate the risk.", "criteria": ["Low", "High"]}}}
+        with self.assertRaisesRegex(jev.JevError, "legend"):
+            jev.build_report(payload, {"answers": {"risk": {"type": "score", "score": 1}}}, provider="openrouter")
 
 
 if __name__ == "__main__":

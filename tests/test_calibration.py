@@ -18,7 +18,9 @@ class CalibrationRunnerTests(unittest.TestCase):
         c.dump(root / "manifest.json", plan)
         return samples, plan
 
-    def jev_response(self, payload):
+    def jev_response(self, payload, provider=None, **kwargs):
+        # The fork's calibration runner pins the NeoHorse helper transport.
+        self.assertEqual(provider, "neohorse")
         return {"answers": {"answer": {"type": "choice", "choice": "(A)", "confidence": 0.6,
             "probabilities": {"(A)": 0.8, "(B)": 0.2}}}, "usage": {"cost": 0.001}}
 

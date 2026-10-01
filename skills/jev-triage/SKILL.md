@@ -7,7 +7,7 @@ description: Use for user-defined inbox, support-ticket, feedback or record clas
 
 ## Setup: choose the service or simulation
 
-Check only the presence of `OPENROUTER_API_KEY` and `TYPESAFE_API_KEY`; never
+Check only the presence of `OPENROUTER_API_KEY`, `TYPESAFE_API_KEY` and `NEO_HORSE_API_KEY`; never
 print credentials. Respect the user's already chosen mode. For a new setup,
 prefer the user's existing OpenRouter account; otherwise offer official TypeSafe.
 If OpenRouter is missing, explain that direct TypeSafe is also real Jev. Do not
@@ -16,7 +16,7 @@ silently change destination, send data, create an account or switch the host mod
 If no route has been chosen, explain the available routes and ask:
 
 > **A — Real Jev:** use/get an OpenRouter key at https://openrouter.ai/settings/keys
-> if you use OpenRouter; otherwise use/get a TypeSafe key at
+> if you use OpenRouter; use a NeoHorse-Jev-4B platform key from https://tokenrhythm.studio; or use/get a TypeSafe key at
 > https://console.typesafe.ai. Configure it locally, not in chat.
 > **B — Simulate:** use the current agent, or an explicitly selected available
 > model such as DeepSeek, with the same context, questions and criteria.
@@ -37,19 +37,18 @@ Never present this as Jev, calibrated probability or equivalent speed/accuracy.
 Skip Jev CLI/API steps in B; use the approved model's existing interface and do
 not install a substitute or send data elsewhere without consent.
 
-In A, select the CLI destination explicitly: `--provider openrouter` or
-`--provider typesafe`. The latter uses `TYPESAFE_API_KEY` and maps the bundled
-OpenRouter model ID to `jev-1.13.0`. `--dry-run` only validates; it neither
+In A, select the CLI destination explicitly: `--provider openrouter`, `--provider typesafe` or `--provider neohorse`. The TypeSafe route uses `TYPESAFE_API_KEY` and maps the bundled
+OpenRouter model ID to `jev-1.13.0`; the NeoHorse route uses `NEO_HORSE_API_KEY`, posts to `https://tokenrhythm.studio/v1/decision` and pins model `NeoHorse-Jev-4B`. `--dry-run` only validates; it neither
 classifies nor makes a network call. `jev-decide setup` reports presence only,
 not key validity, credits or permission. For guided setup and a copyable
-DeepSeek prompt, use `jev-setup` or the [setup guide](https://github.com/wuyoscar/jev-skill/blob/main/skills/jev-setup/SKILL.md).
+DeepSeek prompt, use `jev-setup` or the [setup guide](https://github.com/himetuki/neohorse_jev-skill/blob/main/skills/jev-setup/SKILL.md).
 
 ## Jev API prerequisite and first example
 
 In Jev API mode, use the shared `jev-decide` CLI (Python 3.10+), installed from the reviewed
 `jev-skill` package. If unavailable, explain the missing dependency rather than
 silently installing software. The agent process must inherit
-`OPENROUTER_API_KEY` or `TYPESAFE_API_KEY` for the chosen provider; never place the key in a prompt or request file.
+`OPENROUTER_API_KEY`, `TYPESAFE_API_KEY` or `NEO_HORSE_API_KEY` for the chosen provider; never place the key in a prompt or request file.
 No sibling skill or third-party integration is required for this judgment.
 Actual UI, file, mailbox or simulation actions require the host's own tools.
 
@@ -57,8 +56,7 @@ Resolve `<skill-dir>` to this installed folder. Copy and edit
 [assets/example.json](assets/example.json) for the user's task; it is synthetic
 input, not a captured successful result. Validate it without a key or API call:
 
-The commands below default to OpenRouter. For the official route, append
-`--provider typesafe` to both validation and live calls.
+The commands below default to OpenRouter. For the official route append `--provider typesafe`; for NeoHorse-Jev-4B append `--provider neohorse` to both validation and live calls.
 
 ```bash
 jev-decide decide <skill-dir>/assets/example.json --dry-run

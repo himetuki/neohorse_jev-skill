@@ -14,8 +14,8 @@ an exact preset.
 
 | Situation | Reference | Useful judgment |
 |---|---|---|
-| Select real access or an approved model simulation | [Setup](https://github.com/wuyoscar/jev-skill/blob/main/skills/jev-setup/SKILL.md) | Choose a provider without silently changing destination |
-| Authorized batch, multi-turn or team safety evaluation | [Red-team workflows](https://github.com/wuyoscar/jev-skill/blob/main/skills/jev-redteam/references/workflows.md) | Preserve transcripts, budgets and independent outcomes |
+| Select real access or an approved model simulation | [Setup](https://github.com/himetuki/neohorse_jev-skill/blob/main/skills/jev-setup/SKILL.md) | Choose a provider without silently changing destination |
+| Authorized batch, multi-turn or team safety evaluation | [Red-team workflows](https://github.com/himetuki/neohorse_jev-skill/blob/main/skills/jev-redteam/references/workflows.md) | Preserve transcripts, budgets and independent outcomes |
 | Recent app, alternative-model and creative-use roundups | [76-entry intake](intake-2026-09-21.md) | Read the original evidence and matched scenario |
 | Rich context or a high-volume parallel workload | [Context and throughput](context-and-throughput.md) | Self-contained evidence, shared-state batching and bounded request concurrency |
 | New domain, custom criteria, rubric or personal policy | [Customization](customization.md) | Define the evidence, answer space and downstream consumer |

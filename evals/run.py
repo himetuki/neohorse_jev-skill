@@ -17,7 +17,12 @@ from .scenarios import SCENARIOS, World
 
 CHAT_URL = "https://openrouter.ai/api/v1/chat/completions"
 BASE_MODEL = "deepseek/deepseek-v4.1-flash"
-JEV_MODEL = "typesafe/jev-1.13"
+# This fork practices the NeoHorse-Jev-4B helper route on tokenrhythm.studio;
+# switch --helper-provider (and JEV_MODEL to match) for another transport.
+JEV_MODEL = jev.NEOHORSE_MODEL
+HELPER_PROVIDER = "neohorse"
+HELPER_KEYS = {"openrouter": "OPENROUTER_API_KEY", "typesafe": "TYPESAFE_API_KEY",
+               "neohorse": "NEO_HORSE_API_KEY"}
 CHECKPOINTS = (3, 6, 9)
 FATAL_HTTP_STATUSES = {400, 401, 402, 403, 404}
 BASE_OPTIONS = {"reasoning": {"effort": "none"}, "max_tokens": 512,
@@ -54,11 +59,14 @@ def aggregate(receipts):
 
 
 class Client:
+    def __init__(self, helper_provider=HELPER_PROVIDER):
+        self.helper_provider = helper_provider
+
     def base(self, payload):
         return jev.http_json(CHAT_URL, payload)
 
     def helper(self, payload):
-        return jev.request_decisions(payload)
+        return jev.request_decisions(payload, provider=self.helper_provider)
 
 
 def episode(case_id, arm, client, directory, max_steps=10, base_model=BASE_MODEL):
@@ -158,14 +166,15 @@ def episode(case_id, arm, client, directory, max_steps=10, base_model=BASE_MODEL
     return summary
 
 
-def manifest(cases, repeats, max_steps, base_model=BASE_MODEL):
+def manifest(cases, repeats, max_steps, base_model=BASE_MODEL, helper_provider=HELPER_PROVIDER):
     skill_path = ROOT / "skills" / "jev" / "SKILL.md"
     skill = skill_path.read_text() if skill_path.exists() else ""
     sources = {name: (ROOT / name).read_text() for name in
                ("evals/run.py", "evals/scenarios.py", "skills/jev/scripts/jev.py")}
     return {"created_at": datetime.now(timezone.utc).isoformat(), "cases": cases, "repeats": repeats,
         "max_steps": max_steps, "checkpoints": CHECKPOINTS, "base_model": base_model,
-        "helper_model": JEV_MODEL, "base_options": BASE_OPTIONS, "system_prompt": SYSTEM,
+        "helper_model": JEV_MODEL, "helper_provider": helper_provider,
+        "base_options": BASE_OPTIONS, "system_prompt": SYSTEM,
         "max_api_calls": len(cases) * repeats * (2 * max_steps + sum(s <= max_steps for s in CHECKPOINTS)),
         "scenario_sha256": hashlib.sha256(json.dumps(SCENARIOS, sort_keys=True).encode()).hexdigest(),
         "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
@@ -186,12 +195,14 @@ def manifest(cases, repeats, max_steps, base_model=BASE_MODEL):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--live", action="store_true", help="Allow billed OpenRouter calls")
+    parser.add_argument("--live", action="store_true", help="Allow billed calls on both transports")
     parser.add_argument("--output", type=Path, help="New output directory (never overwritten)")
     parser.add_argument("--repeats", type=int, default=1)
     parser.add_argument("--max-steps", type=int, default=10)
     parser.add_argument("--base-model", default=BASE_MODEL,
                         help="Explicit OpenRouter model ID used identically by both arms; no automatic fallback")
+    parser.add_argument("--helper-provider", choices=sorted(HELPER_KEYS), default=HELPER_PROVIDER,
+                        help="Jev helper transport; default neohorse (tokenrhythm.studio). JEV_MODEL must match")
     parser.add_argument("--cases", nargs="+", choices=list(SCENARIOS), default=list(SCENARIOS))
     args = parser.parse_args(argv)
     if not 1 <= args.repeats <= 10 or not 1 <= args.max_steps <= 30:
@@ -200,12 +211,15 @@ def main(argv=None):
         parser.error("case IDs must not be repeated")
     if not args.base_model.strip():
         parser.error("base-model must be a nonempty model ID")
-    plan = manifest(args.cases, args.repeats, args.max_steps, args.base_model)
+    plan = manifest(args.cases, args.repeats, args.max_steps, args.base_model, args.helper_provider)
     if not args.live:
         print(json.dumps(plan, indent=2))
         return 0
     if args.output is None or not os.environ.get("OPENROUTER_API_KEY"):
         parser.error("--live requires --output and OPENROUTER_API_KEY")
+    helper_key = HELPER_KEYS[args.helper_provider]
+    if not os.environ.get(helper_key):
+        parser.error(f"--live requires {helper_key} for the {args.helper_provider} helper route")
     args.output.mkdir(parents=True, exist_ok=False)
     dump(args.output / "manifest.json", plan)
     results = []
@@ -213,7 +227,7 @@ def main(argv=None):
         for index, case in enumerate(args.cases):
             arms = ("baseline", "jev") if (repeat + index) % 2 == 0 else ("jev", "baseline")
             for arm in arms:
-                result = episode(case, arm, Client(), args.output / f"r{repeat + 1}-{case}-{arm}",
+                result = episode(case, arm, Client(args.helper_provider), args.output / f"r{repeat + 1}-{case}-{arm}",
                                  args.max_steps, args.base_model)
                 results.append({"repeat": repeat + 1, **result})
                 dump(args.output / "results.json", results)

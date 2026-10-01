@@ -1,20 +1,27 @@
 #!/usr/bin/env python3
-"""Typed Jev decisions through OpenRouter or TypeSafe. Python standard library only."""
+"""Typed Jev decisions through OpenRouter, TypeSafe or a custom NeoHorse-Jev-4B endpoint. Python standard library only."""
 
 import argparse
+import ipaddress
 import json
 import math
 import os
+import socket
 from pathlib import Path
 import sys
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 
 DEFAULT_MODEL = "typesafe/jev-1.13"
 DECISIONS_URL = "https://openrouter.ai/api/alpha/decisions"
 TYPESAFE_URL = "https://api.typesafe.ai/v1/systemone"
 TYPESAFE_MODEL = "jev-1.13.0"
+NEOHORSE_URL = "https://tokenrhythm.studio/v1/decision"
+NEOHORSE_MODEL = "NeoHorse-Jev-4B"
+NEOHORSE_KEY_NAME = "NEO_HORSE_API_KEY"
+ALLOWED_HOSTS = {"openrouter.ai", "api.typesafe.ai", "tokenrhythm.studio"}
 REVIEW_LABELS = {"other", "unknown", "abstain", "review", "ask_user", "wait",
                  "none", "defer", "insufficient_evidence"}
 
@@ -44,6 +51,27 @@ def number(value, low, high, name):
             or not math.isfinite(value) or not low <= value <= high):
         raise JevError(f"{name} must be a finite number in [{low}, {high}]")
     return value
+
+
+def check_public_endpoint(url):
+    """Allow only https requests to documented public hosts, and reject any
+    address that resolves into a private, loopback, link-local or reserved
+    range (blocks SSRF into internal networks)."""
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme != "https":
+        raise JevError("only https endpoints are supported")
+    host = parsed.hostname
+    if host not in ALLOWED_HOSTS:
+        raise JevError("endpoint host is not in the documented allowlist")
+    try:
+        infos = socket.getaddrinfo(host, None)
+    except socket.gaierror:
+        raise JevError(f"cannot resolve endpoint host {host!r}") from None
+    for info in infos:
+        address = ipaddress.ip_address(info[4][0])
+        if (address.is_private or address.is_loopback or address.is_link_local
+                or address.is_reserved or address.is_multicast or address.is_unspecified):
+            raise JevError(f"endpoint host {host!r} resolves to a blocked address")
 
 
 def validate_request(payload):
@@ -101,9 +129,10 @@ def http_json(url, payload, timeout=30):
         DECISIONS_URL: ("OPENROUTER_API_KEY", "OpenRouter"),
         "https://openrouter.ai/api/v1/chat/completions": ("OPENROUTER_API_KEY", "OpenRouter"),
         TYPESAFE_URL: ("TYPESAFE_API_KEY", "TypeSafe"),
+        NEOHORSE_URL: (NEOHORSE_KEY_NAME, "NeoHorse"),
     }
     if url not in endpoints:
-        raise JevError("Only the documented OpenRouter and TypeSafe endpoints are supported")
+        raise JevError("Only the documented OpenRouter, TypeSafe and NeoHorse endpoints are supported")
     key_name, provider_name = endpoints[url]
     number(timeout, 0.1, 300, "timeout")
     key = os.environ.get(key_name, "").strip()
@@ -111,11 +140,12 @@ def http_json(url, payload, timeout=30):
         raise JevError(f"Set {key_name} in the calling process environment; run setup for choices")
     if any(ord(character) < 33 or ord(character) > 126 for character in key):
         raise JevError(f"{key_name} contains invalid whitespace or non-ASCII characters")
-    request = urllib.request.Request(
-        url, data=json.dumps(payload, allow_nan=False).encode(),
-        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json",
-                 "X-OpenRouter-Title": "Jev Skill"}, method="POST",
-    )
+    check_public_endpoint(url)
+    headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
+    if url.startswith("https://openrouter.ai/"):
+        headers["X-OpenRouter-Title"] = "Jev Skill"
+    request = urllib.request.Request(url, data=json.dumps(payload, allow_nan=False).encode(),
+                                     headers=headers, method="POST")
     try:
         with urllib.request.build_opener(NoRedirect).open(request, timeout=timeout) as response:
             result = load_json(response.read().decode())
@@ -134,31 +164,33 @@ def http_json(url, payload, timeout=30):
 
 
 def request_decisions(payload, timeout=30, provider="openrouter"):
-    if provider not in {"openrouter", "typesafe"}:
-        raise JevError("provider must be openrouter or typesafe")
-    url = DECISIONS_URL if provider == "openrouter" else TYPESAFE_URL
-    return http_json(url, validate_request(payload), timeout)
+    urls = {"openrouter": DECISIONS_URL, "typesafe": TYPESAFE_URL, "neohorse": NEOHORSE_URL}
+    if provider not in urls:
+        raise JevError("provider must be openrouter, typesafe or neohorse")
+    return http_json(urls[provider], validate_request(payload), timeout)
 
 
 def setup_report():
     """Inspect presence only. Do not test credentials, write config or choose a mode."""
     available = {name: bool(os.environ.get(key, "").strip()) for name, key in
-                 [("openrouter", "OPENROUTER_API_KEY"), ("typesafe", "TYPESAFE_API_KEY")]}
+                 [("openrouter", "OPENROUTER_API_KEY"), ("typesafe", "TYPESAFE_API_KEY"),
+                  ("neohorse", NEOHORSE_KEY_NAME)]}
     return {
         "available": available,
         "recommended_provider": next((name for name, present in available.items() if present), None),
         "requires_user_choice": True, "jev_called": False,
         "options": {
-            "A": "Real Jev: use or obtain an OpenRouter key if you use OpenRouter; otherwise a TypeSafe key.",
+            "A": "Real Jev: an OpenRouter key, a NeoHorse-Jev-4B platform key for tokenrhythm.studio, or a TypeSafe key.",
             "B": "After consent, use the current agent or an explicitly selected available model such as DeepSeek to simulate; no Jev probabilities.",
         },
         "key_pages": {"openrouter": "https://openrouter.ai/settings/keys",
-                      "typesafe": "https://console.typesafe.ai"},
+                      "typesafe": "https://console.typesafe.ai",
+                      "neohorse": "https://tokenrhythm.studio"},
         "note": "Presence is not authentication or credit validation. No network call or configuration change was made.",
     }
 
 
-def distribution(answer, labels, name):
+def distribution(answer, labels, name, provider):
     probabilities = answer.get("probabilities")
     if not isinstance(probabilities, dict) or set(probabilities) != set(labels):
         raise JevError(f"{name}: returned probabilities must match the candidate labels")
@@ -167,12 +199,14 @@ def distribution(answer, labels, name):
     # Jev rounds probabilities; allow rounding error, not arbitrary weights.
     if not math.isclose(sum(probabilities.values()), 1, abs_tol=min(0.05, 0.0051 * len(labels))):
         raise JevError(f"{name}: probabilities must sum to approximately one")
-    number(answer.get("confidence"), 0, 1, f"{name} confidence")
+    # NeoHorse documents confidence as optional; the other providers always return it.
+    if "confidence" in answer or provider != "neohorse":
+        number(answer.get("confidence"), 0, 1, f"{name} confidence")
     return probabilities
 
 
 def build_report(payload, response, min_probability=0.8, min_margin=0.15,
-                 review_labels=None):
+                 review_labels=None, provider="openrouter"):
     """Conservative interpretation, NOT permission to perform an action."""
     validate_request(payload)
     number(min_probability, 0.5, 1, "min_probability")
@@ -185,10 +219,16 @@ def build_report(payload, response, min_probability=0.8, min_margin=0.15,
     for name, question in payload["questions"].items():
         answer = answers.get(name)
         kind = question["type"]
-        if not isinstance(answer, dict) or answer.get("type") != kind:
+        if not isinstance(answer, dict):
+            raise JevError(f"Missing or wrong-typed answer: {name}")
+        answer_type = answer.get("type")
+        # NeoHorse documents bare answer objects without the echoed type.
+        if answer_type is None and provider != "neohorse":
+            raise JevError(f"Missing or wrong-typed answer: {name}")
+        if answer_type is not None and answer_type != kind:
             raise JevError(f"Missing or wrong-typed answer: {name}")
         if kind == "choice":
-            probabilities = distribution(answer, question["criteria"], name)
+            probabilities = distribution(answer, question["criteria"], name, provider)
             ranked = sorted(probabilities, key=probabilities.get, reverse=True)
             value = answer.get("choice")
             if not isinstance(value, str) or value not in probabilities or probabilities[value] != probabilities[ranked[0]]:
@@ -207,9 +247,14 @@ def build_report(payload, response, min_probability=0.8, min_margin=0.15,
                                "value": value, "probability": probability}
         else:
             labels = {str(i) for i in range(len(question["criteria"]))}
-            distribution(answer, labels, name)
-            if not isinstance(answer.get("legend"), dict) or set(answer["legend"]) != labels:
-                raise JevError(f"{name}: score must include a legend for every level")
+            # NeoHorse documents a bare score level expectation, without the
+            # probabilities/legend envelope the other providers return.
+            if isinstance(answer.get("probabilities"), dict):
+                distribution(answer, labels, name, provider)
+                if not isinstance(answer.get("legend"), dict) or set(answer["legend"]) != labels:
+                    raise JevError(f"{name}: score must include a legend for every level")
+            elif provider != "neohorse":
+                raise JevError(f"{name}: score must include probabilities and a legend for every level")
             score = number(answer.get("score"), 0, len(question["criteria"]) - 1, f"{name} score")
             decisions[name] = {"status": "scored", "value": score,
                                "levels": question["criteria"]}
@@ -235,7 +280,7 @@ def parser():
     text.add_argument("--text-file", help="UTF-8 file, or - for stdin")
     classify.add_argument("--criteria", required=True, help="JSON file mapping labels to descriptions")
     for command in [decide, classify]:
-        command.add_argument("--provider", choices=["openrouter", "typesafe"], default="openrouter",
+        command.add_argument("--provider", choices=["openrouter", "typesafe", "neohorse"], default="openrouter",
                              help="Explicit destination; default openrouter. Never falls back automatically")
         command.add_argument("--model", help=f"Default: request model, JEV_MODEL, or {DEFAULT_MODEL}")
         command.add_argument("--min-probability", type=float, default=0.8,
@@ -268,12 +313,15 @@ def main(argv=None):
                              "criteria": read_json(args.criteria)}}}
         if not isinstance(payload, dict):
             raise JevError("Request must be a JSON object")
-        default_model = DEFAULT_MODEL if args.provider == "openrouter" else TYPESAFE_MODEL
-        payload["model"] = args.model or payload.get("model") or os.environ.get("JEV_MODEL") or default_model
-        # Bundled examples carry the OpenRouter model ID; explicit provider selection
-        # maps that one known ID. Custom overrides are never rewritten.
-        if args.provider == "typesafe" and not args.model and payload["model"] == DEFAULT_MODEL:
-            payload["model"] = TYPESAFE_MODEL
+        provider_models = {"openrouter": DEFAULT_MODEL, "typesafe": TYPESAFE_MODEL,
+                           "neohorse": NEOHORSE_MODEL}
+        # Bundled examples carry the OpenRouter model ID; explicit provider
+        # selection maps that one known ID. Custom overrides are never rewritten.
+        payload["model"] = (args.model or payload.get("model")
+                            or os.environ.get("JEV_MODEL")
+                            or provider_models[args.provider])
+        if not args.model and payload["model"] == DEFAULT_MODEL:
+            payload["model"] = provider_models[args.provider]
         validate_request(payload)
         number(args.min_probability, 0.5, 1, "min_probability")
         number(args.min_margin, 0, 1, "min_margin")
@@ -284,7 +332,7 @@ def main(argv=None):
         started = time.monotonic()
         response = request_decisions(payload, timeout=args.timeout, provider=args.provider)
         report = build_report(payload, response, args.min_probability, args.min_margin,
-                              REVIEW_LABELS | set(args.review_label))
+                              REVIEW_LABELS | set(args.review_label), args.provider)
         report["elapsed_seconds"] = round(time.monotonic() - started, 6)
         report["mode"] = "jev_api"
         report["jev_called"] = True

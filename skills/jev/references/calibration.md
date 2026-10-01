@@ -131,8 +131,8 @@ references, not independently labeled outcomes.
 [evaluation methodology](https://evals.typesafe.ai/)
 
 See [decision datasets](decision-datasets.md) and the
-[calibration protocol/results](https://github.com/wuyoscar/jev-skill/blob/main/evals/CALIBRATION.md) for local evidence.
-The [160-item BBH pilot results](https://github.com/wuyoscar/jev-skill/blob/main/evals/CALIBRATION_RESULTS.md)
+[calibration protocol/results](https://github.com/himetuki/neohorse_jev-skill/blob/main/evals/CALIBRATION.md) for local evidence.
+The [160-item BBH pilot results](https://github.com/himetuki/neohorse_jev-skill/blob/main/evals/CALIBRATION_RESULTS.md)
 (four tasks × 40 items) include a label-only DeepSeek comparison. Jev matched
 136/160 labels; confidence >=0.9 selected 100 with eight errors. High-confidence
 causal judgment alone matched only 14/20. These results characterize that sample,

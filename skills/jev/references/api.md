@@ -25,8 +25,30 @@ shared. Keys are bound to fixed provider endpoints; no arbitrary base URL,
 automatic service switching, retry or simulation is provided.
 
 `jev-decide setup` checks presence only and explains A/B choices. See the
-[setup skill](https://github.com/wuyoscar/jev-skill/blob/main/skills/jev-setup/SKILL.md)
+[setup skill](https://github.com/himetuki/neohorse_jev-skill/blob/main/skills/jev-setup/SKILL.md)
 and [official API](https://docs.typesafe.ai/api), [model IDs](https://docs.typesafe.ai/models).
+
+## Custom NeoHorse-Jev-4B route
+
+Select it deliberately with `--provider neohorse`; use `NEO_HORSE_API_KEY`.
+The endpoint is `POST https://tokenrhythm.studio/v1/decision`, with Bearer auth
+and the same state/questions shape. The model ID is fixed at `NeoHorse-Jev-4B`,
+and the bundled OpenRouter ID maps to it on selection. Keys are bound to the
+fixed endpoint; no arbitrary base URL, automatic service switching, retry or
+simulation is provided. `/v1/decision` is the recommended format; the
+System One compatible `/v1/systemone` variant is not used by this CLI.
+
+Documented answer shapes: `choice` returns `choice` and `probabilities`; `noul`
+returns a 0–1 establishment probability; `score` returns a level expectation
+counted from 0. `confidence` is optional and its documented absence is
+tolerated. Platform errors return `code`, `message` and `traceId`; 401 invalid
+key, 403 missing access, 413 body too large, 422 parameter or input limit,
+429 capacity limiting and 502/503/504 upstream failures all surface as provider
+errors without an automatic retry. Keep to 1–16 text questions per request; this
+CLI sends text/JSON only.
+
+Privacy: this is a third-party platform. Obtain the user's consent before
+sending non-public evidence, and treat request/response traces as sensitive.
 
 ## Native request
 

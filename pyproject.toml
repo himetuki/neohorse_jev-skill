@@ -3,18 +3,19 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "jev-skill"
+name = "neohorse-jev-skill"
 version = "0.2.0"
-description = "An awesome collection of Jev use cases, workflows, and agent skills"
+description = "Jev use cases, workflows, and agent skills, routed to the NeoHorse-Jev-4B decision endpoint on tokenrhythm.studio"
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
-authors = [{name = "wuyoscar"}]
+authors = [{name = "wuyoscar"}, {name = "himetuki"}]
 dependencies = []
 
 [project.urls]
-Repository = "https://github.com/wuyoscar/jev-skill"
-Issues = "https://github.com/wuyoscar/jev-skill/issues"
+Repository = "https://github.com/himetuki/neohorse_jev-skill"
+Upstream = "https://github.com/wuyoscar/jev-skill"
+Issues = "https://github.com/himetuki/neohorse_jev-skill/issues"
 
 [project.scripts]
 jev-decide = "jev:main"

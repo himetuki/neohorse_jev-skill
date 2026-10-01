@@ -10,7 +10,9 @@ not their model/version, authentication, thresholds or performance claims.
 Start with the [customization contract](customization.md). Each card names what
 can change and who consumes the answer. Community source IDs link to pinned
 implementations; neither those projects nor their dependencies are installed by
-this skill. Our transport remains OpenRouter and `OPENROUTER_API_KEY`.
+this skill. On this fork the default real transport is NeoHorse-Jev-4B on
+tokenrhythm.studio (`--provider neohorse`, `NEO_HORSE_API_KEY`); OpenRouter
+(`OPENROUTER_API_KEY`) and official TypeSafe (`TYPESAFE_API_KEY`) remain available.
 
 ## 1. Select an original span instead of generating a value
 

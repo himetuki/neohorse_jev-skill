@@ -42,7 +42,7 @@ class SkillCatalogTests(unittest.TestCase):
             self.assertEqual(len(re.findall(r"^### \d+\.", text, re.M)), 108)
 
     def test_agent_first_installation_entrypoint(self):
-        guide_url = "https://raw.githubusercontent.com/wuyoscar/jev-skill/main/docs/install.md"
+        guide_url = "https://raw.githubusercontent.com/himetuki/neohorse_jev-skill/main/docs/install.md"
         for filename in ("README.md", "README.zh.md"):
             text = (ROOT / filename).read_text()
             first_block = re.search(r"```(\w*)\n(.*?)\n```", text, re.S)
@@ -237,7 +237,14 @@ class SkillCatalogTests(unittest.TestCase):
                 self.assertEqual(markers[index + 1], ("receipt", markers[index][1]))
             for key, payload in shown:
                 with self.subTest(readme=filename, request=key):
-                    self.assertEqual(json.loads(payload), expected[key])
+                    shown_request = json.loads(payload)
+                    saved_request = dict(expected[key])
+                    # This fork retargets the bundled examples at the
+                    # NeoHorse-Jev-4B route, while receipts keep the model the
+                    # upstream runs actually sent; compare everything else.
+                    self.assertEqual(shown_request.pop("model"), jev.NEOHORSE_MODEL)
+                    self.assertEqual(saved_request.pop("model"), "typesafe/jev-1.13")
+                    self.assertEqual(shown_request, saved_request)
 
     def test_readme_outputs_match_all_saved_example_receipts(self):
         expected = {}

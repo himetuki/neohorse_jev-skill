@@ -1,7 +1,7 @@
 # Decision and calibration datasets
 
 Source check: **2026-09-20**. This is a dataset menu and test design, not a claim
-that all these experiments ran. Only the [BBH pilot](https://github.com/wuyoscar/jev-skill/blob/main/evals/CALIBRATION_RESULTS.md)
+that all these experiments ran. Only the [BBH pilot](https://github.com/himetuki/neohorse_jev-skill/blob/main/evals/CALIBRATION_RESULTS.md)
 has completed here. Static decision accuracy is not agent task success.
 
 ## Current pilot: 160 BBH decisions
@@ -28,7 +28,7 @@ No remote dataset code is needed. The authors also supply small JSON files under
 
 The BBH repository declares MIT; the HF mirror does not declare a license in its
 current card. Preserve original and upstream notices; see
-[third-party attribution](https://github.com/wuyoscar/jev-skill/blob/main/evals/THIRD_PARTY.md). These older public
+[third-party attribution](https://github.com/himetuki/neohorse_jev-skill/blob/main/evals/THIRD_PARTY.md). These older public
 benchmarks may be contaminated and their labels are not infallible.
 
 **Ambiguous answer ≠ uncertainty abstention.** Selecting C correctly says the

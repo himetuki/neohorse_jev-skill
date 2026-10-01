@@ -143,7 +143,8 @@ class EvaluationTests(unittest.TestCase):
     def test_pilot_bound(self):
         plan = manifest(list(SCENARIOS), 1, 10)
         self.assertEqual(plan["max_api_calls"], 92)
-        self.assertEqual(plan["helper_model"], "typesafe/jev-1.13")
+        self.assertEqual(plan["helper_model"], jev.NEOHORSE_MODEL)
+        self.assertEqual(plan["helper_provider"], "neohorse")
 
     def test_base_transport_error_stops_without_retry(self):
         class FailedClient:
@@ -165,7 +166,8 @@ class EvaluationTests(unittest.TestCase):
                 patch("evals.run.Client") as client, patch("builtins.print"):
             client.return_value.base.side_effect = error
             output = Path(tmp) / "run"
-            result = main(["--live", "--output", str(output), "--base-model", "explicit/test-model"])
+            result = main(["--live", "--output", str(output), "--base-model", "explicit/test-model",
+                           "--helper-provider", "openrouter"])
             self.assertEqual(result, 1)
             client.return_value.base.assert_called_once()
             self.assertEqual(client.return_value.base.call_args.args[0]["model"], "explicit/test-model")
@@ -177,6 +179,12 @@ class EvaluationTests(unittest.TestCase):
             receipts = (output / "r1-goal_recovery-baseline/events.jsonl").read_text()
             self.assertNotIn("arbitrary provider body", receipts)
             self.assertEqual(json.loads(receipts)["error"]["http_status"], 403)
+
+    def test_live_requires_helper_key_for_selected_provider(self):
+        with tempfile.TemporaryDirectory() as tmp, \
+                patch.dict("os.environ", {"OPENROUTER_API_KEY": "test-only"}, clear=True), \
+                patch("builtins.print"), self.assertRaises(SystemExit):
+            main(["--live", "--output", str(Path(tmp) / "run"), "--helper-provider", "neohorse"])
 
     def test_fatal_helper_aborts_before_another_base_call(self):
         client = FakeClient(PLANS["goal_recovery"])

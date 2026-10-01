@@ -1,14 +1,20 @@
 <div align="center">
 
-# ⚡ Awesome Jev Skills
+# ⚡ NeoHorse Jev Skills
 
-**Things to try. Skills to install. Ideas to make your own.**
+**Things to try. Skills to install. Ideas to make your own — routed to NeoHorse-Jev-4B.**
 
-[![Skills](https://img.shields.io/badge/skills-11-7c3aed?style=flat-square)](#install) [![Scenarios](https://img.shields.io/badge/scenarios-108-0d9488?style=flat-square)](#catalog) [![Tests](https://github.com/wuyoscar/jev-skill/actions/workflows/test.yml/badge.svg)](https://github.com/wuyoscar/jev-skill/actions/workflows/test.yml) [![MIT](https://img.shields.io/badge/license-MIT-ea580c?style=flat-square)](LICENSE)
+[![Skills](https://img.shields.io/badge/skills-11-7c3aed?style=flat-square)](#install) [![Scenarios](https://img.shields.io/badge/scenarios-108-0d9488?style=flat-square)](#catalog) [![Route](https://img.shields.io/badge/route-NeoHorse--Jev--4B-7c3aed?style=flat-square)](#no-key) [![MIT](https://img.shields.io/badge/license-MIT-ea580c?style=flat-square)](LICENSE)
 
 [English](README.md) · [简体中文](README.zh.md)
 
 [🧭 Projects](#projects) · [🎬 Demos](#showcase) · [📦 Install](#install) · [🚀 How to use](#usage) · [🗂 All 108 scenarios](#catalog) · [🧪 Input → output](#io) · [🆕 Updates](docs/updates/README.md)
+
+> **Fork notice.** This repository repoints the collection at the **NeoHorse-Jev-4B**
+> decision endpoint on tokenrhythm.studio (`--provider neohorse`; key `NEO_HORSE_API_KEY`
+> read from the local environment only), with transport hardening, added tests and ZCode
+> practice notes on top of upstream [wuyoscar/jev-skill](https://github.com/wuyoscar/jev-skill)
+> v0.2.0. The OpenRouter and official TypeSafe routes remain available.
 
 </div>
 
@@ -58,11 +64,11 @@ Community demos, linked to their authors. These are not our test runs.
 <a id="install"></a>
 ## 📦 Install: give this to your agent
 
-Paste this into **Codex, Claude Code or OpenCode**:
+Paste this into your coding agent (**ZCode**, Claude Code, Codex or OpenCode):
 
 ```text
 Install Jev Skills for my current agent, including the general skill and all scenario skills. Read and follow this installation guide, then verify the installation:
-https://raw.githubusercontent.com/wuyoscar/jev-skill/main/docs/install.md
+https://raw.githubusercontent.com/himetuki/neohorse_jev-skill/main/docs/install.md
 ```
 
 Your agent checks the environment, installs into the current project by default,
@@ -78,18 +84,19 @@ No Vercel account is needed; Node/npm is not required by the default install rou
 need; you do not have to write JSON. Use real Jev through either supported provider, or an approved agent/model simulation.
 
 <a id="no-key"></a>
-### 🔑 Setup: OpenRouter, official API, or simulation
+### 🔑 Setup: NeoHorse-Jev-4B, OpenRouter, official API, or simulation
 
 Tell your agent: **“Use jev-setup to check which route is available; do not make a paid call yet.”**
 The agent checks key presence only and asks before changing mode or destination.
 
 | Your situation | Next step |
 |---|---|
+| Using the NeoHorse-Jev-4B platform on tokenrhythm.studio | Get a platform key at https://tokenrhythm.studio; set `NEO_HORSE_API_KEY` locally and call with `--provider neohorse`. |
 | Already use OpenRouter | Use/get a key at [OpenRouter](https://openrouter.ai/settings/keys); set `OPENROUTER_API_KEY` locally. |
 | Do not use OpenRouter | Use the [official TypeSafe console](https://console.typesafe.ai); set `TYPESAFE_API_KEY` locally. No aggregator account required. |
 | Neither key, or no wish to apply | Choose B: current-agent or explicitly selected available-model simulation, including DeepSeek. |
 
-> **A: Real Jev.** Choose OpenRouter or TypeSafe, configure the matching key locally, then approve the input and API usage.
+> **A: Real Jev.** Choose NeoHorse-Jev-4B, OpenRouter or TypeSafe, configure the matching key locally, then approve the input and API usage.
 >
 > **B: Simulate.** Use the same context, candidates and criteria with your current agent or an available model you explicitly choose.
 
@@ -101,7 +108,7 @@ use an existing approved interface. [Copyable simulation prompt](skills/jev-setu
 
 `jev-decide setup` is read-only: no network, login or credential storage.
 `--dry-run` validates input only. Real calls incur usage. Do not paste keys in chat.
-Use `--provider openrouter` or `--provider typesafe`; there is no automatic fallback.
+Use `--provider neohorse`, `--provider openrouter` or `--provider typesafe`; there is no automatic fallback.
 [Full setup skill](skills/jev-setup/SKILL.md).
 
 ### Try one example
@@ -109,7 +116,7 @@ Use `--provider openrouter` or `--provider typesafe`; there is no automatic fall
 ```text
 Use the jev-triage skill and read assets/example.json from its installed folder.
 Show its context, questions and candidates. First use jev-setup to choose:
-A: real Jev through OpenRouter or TypeSafe; B: an explicitly approved simulation.
+A: real Jev through NeoHorse-Jev-4B, OpenRouter or TypeSafe; B: an explicitly approved simulation.
 Wait for my choice. In API mode, validate with --dry-run and the selected --provider, then make one Jev call.
 In B mode, identify the chosen agent/model and label the result "Simulation; Jev not called".
 Do not invent probabilities. Show the complete input, output and mode,
@@ -192,8 +199,9 @@ After validation and approval to send that data to the selected provider, make t
 jev-decide decide request.json > result.json
 ```
 
-Commands default to OpenRouter. For the official route, add `--provider typesafe`
-to both the dry run and the real call.
+Commands default to OpenRouter. For the NeoHorse-Jev-4B route add `--provider neohorse`, and
+for the official TypeSafe route add `--provider typesafe`, to both the dry run and the
+real call.
 
 Read `result.json`, not just the process exit code. Exit `0` means selected/scored,
 `2` means review, and `1` means error; selecting an action does not execute it.
@@ -353,7 +361,7 @@ The first complete I/O pair: [stuck-loop recovery ↓](#sc-a02). [How probabilit
 <!-- request: examples-2026-09-20.json#checkpoint -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "goal": "Fix the CSV parser without changing the public API; verify tests before declaring done.",
     "permissions": "Read and edit this local project, run tests; no publishing.",
@@ -426,7 +434,7 @@ The first complete I/O pair: [stuck-loop recovery ↓](#sc-a02). [How probabilit
 <!-- request: examples-2026-09-20.json#completion -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "goal": "Run the evaluation and produce a metrics file.",
     "agent_claim": "The evaluation is complete.",
@@ -549,7 +557,7 @@ The first complete I/O pair: [stuck-loop recovery ↓](#sc-a02). [How probabilit
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-code-review/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "goal": "Make the parser accept quoted commas without weakening its regression test.",
     "diff": {
@@ -793,7 +801,7 @@ or a test of the detector above. Typed output does not make a decision injection
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-route/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "task": "Explain why two observed implementations disagree on concurrent writes.",
     "requirements": [
@@ -899,7 +907,7 @@ or a test of the detector above. Typed output does not make a decision injection
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-find-code/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "question": "Where should I inspect duplicate invoice creation?",
     "candidates": {
@@ -964,7 +972,7 @@ or a test of the detector above. Typed output does not make a decision injection
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-context/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "task": "Fix CSV parsing of quoted commas.",
     "blocks": {
@@ -1080,7 +1088,7 @@ or a test of the detector above. Typed output does not make a decision injection
 <!-- request: examples-2026-09-20.json#browser-route -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "goal": "Find the cancellation policy for a hotel; do not book or pay.",
     "observation_source": "Synthetic browser accessibility snapshot",
@@ -1144,7 +1152,7 @@ or a test of the detector above. Typed output does not make a decision injection
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-ui/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "snapshot_id": "demo-12",
     "goal": "Find the cancellation policy; do not book or pay.",
@@ -1371,7 +1379,7 @@ or a test of the detector above. Typed output does not make a decision injection
 <!-- request: examples-2026-09-20.json#triage -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "record": "Our invoices show two charges for the same order. Checkout still works. Could someone check this today?"
   },
@@ -1435,7 +1443,7 @@ or a test of the detector above. Typed output does not make a decision injection
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-triage/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "record_id": "ticket-07",
     "text": "The export button returns an error for all team members. We need the monthly report tomorrow.",
@@ -1722,7 +1730,7 @@ or a test of the detector above. Typed output does not make a decision injection
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-documents/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "question": "Which address is explicitly for invoice delivery?",
     "candidates": {
@@ -2026,7 +2034,7 @@ or a test of the detector above. Typed output does not make a decision injection
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-simulation/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "world": "Fictional island town",
     "goal": "Keep residents supplied while avoiding unsafe crossings.",
@@ -2095,7 +2103,7 @@ or a test of the detector above. Typed output does not make a decision injection
 <!-- request: examples-2026-09-20.json#rubric -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "idea": "An offline-first pantry app that turns existing ingredients into a short weekly shopping list, without requiring an account.",
     "audience": "Busy households who want less food waste.",
@@ -2243,7 +2251,7 @@ TypeSafe key; we have not installed it or tested its thresholds.
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev/assets/voice-style.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "setting": "Fictional classroom podcast. These are scripted characters, not real people.",
     "last_line": {

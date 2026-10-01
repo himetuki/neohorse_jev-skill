@@ -7,11 +7,14 @@ The commands below are optional manual alternatives, not steps every user must r
 ## No key: ask first, then choose a mode
 
 Use [jev-setup](../skills/jev-setup/SKILL.md) to check key presence without printing
-values. Prefer an existing OpenRouter account; otherwise offer official TypeSafe.
+values. On this fork, offer the NeoHorse-Jev-4B platform first; an existing
+OpenRouter account or the official TypeSafe console remain valid alternatives.
 If no route is configured, explain the choices and **wait**:
 
-- **A — Real Jev:** [OpenRouter key](https://openrouter.ai/settings/keys) if you
-  use OpenRouter, otherwise [TypeSafe key](https://console.typesafe.ai).
+- **A — Real Jev:** a [NeoHorse-Jev-4B platform key](https://tokenrhythm.studio)
+  (`NEO_HORSE_API_KEY`, `--provider neohorse`), an
+  [OpenRouter key](https://openrouter.ai/settings/keys) if you use OpenRouter, or a
+  [TypeSafe key](https://console.typesafe.ai).
 - **B — Simulation:** the current agent or an explicitly approved available model
   such as DeepSeek uses the same evidence, questions and criteria. Install the
   skill folders; no Jev CLI or Jev key is needed. See the
@@ -38,9 +41,9 @@ The runtime and credentials instructions below apply to **API mode**, not B.
 ## Optional package-tool and skills-installer route
 
 ```bash
-uv tool install git+https://github.com/wuyoscar/jev-skill.git@v0.2.0
-npx skills add wuyoscar/jev-skill --skill jev-triage
-export OPENROUTER_API_KEY="your-key"
+uv tool install git+https://github.com/himetuki/neohorse_jev-skill.git@neohorse-jev-4b
+npx skills add himetuki/neohorse_jev-skill --skill jev-triage
+export NEO_HORSE_API_KEY="your-key"
 ```
 
 Select Codex, Claude Code or OpenCode in the installer; replace the skill name
@@ -48,15 +51,17 @@ with any entry below. The CLI is pinned to the release; the short skills command
 tracks the repository's default branch. For a fully pinned skill installation,
 clone the tag and use the local installer commands below.
 
-[Release downloads](https://github.com/wuyoscar/jev-skill/releases/tag/v0.2.0)
-include the CLI wheel, source distribution and complete source ZIP. No PyPI
-account is needed. Use the key for your selected provider.
+[Fork releases](https://github.com/himetuki/neohorse_jev-skill/releases)
+include the CLI wheel, source distribution and complete source ZIP once the
+branch is published. No PyPI account is needed. Use the key for your selected
+provider; this fork's default is `NEO_HORSE_API_KEY` for the NeoHorse-Jev-4B
+route.
 
 ## From a reviewed checkout
 
 ```bash
-git clone --branch v0.2.0 https://github.com/wuyoscar/jev-skill.git
-cd jev-skill
+git clone --branch neohorse-jev-4b https://github.com/himetuki/neohorse_jev-skill.git
+cd neohorse_jev-skill
 ```
 
 In the root of that checkout:
@@ -97,6 +102,7 @@ Project-local destinations:
 
 | Host | Destination |
 |---|---|
+| ZCode | `~/.zcode/skills/<name>/` (user-wide) or `<project>/.zcode/skills/<name>/` |
 | Codex | `.agents/skills/<name>/` |
 | Claude Code | `.claude/skills/<name>/` |
 | OpenCode | `.opencode/skills/<name>/` (also supports shared `.agents/skills/`) |
@@ -113,13 +119,18 @@ The reference format follows the [Agent Skills specification](https://agentskill
 
 For **A / Jev API mode** only; B skips these calls and uses the selected existing model interface.
 
-Export `OPENROUTER_API_KEY` or `TYPESAFE_API_KEY` for the selected provider in the
-environment that **launches the host**. Desktop
-apps may not inherit a terminal export. Use the host's documented environment
-setup; never put keys in `SKILL.md`, chat, request JSON or version control.
+Export the selected provider's key in the environment that **launches the host**:
+`NEO_HORSE_API_KEY` for the fork's default NeoHorse-Jev-4B route, otherwise
+`OPENROUTER_API_KEY` or `TYPESAFE_API_KEY`. Desktop
+apps may not inherit a terminal export; on Windows set a user-level variable
+(*Settings → "Edit environment variables for your account" → New…*, or
+`[Environment]::SetEnvironmentVariable('NEO_HORSE_API_KEY','…','User')`) and
+restart the host so child processes inherit it. Use the host's documented
+environment setup; never put keys in `SKILL.md`, chat, request JSON or version
+control.
 
 ```bash
-export OPENROUTER_API_KEY="your-key"
+export NEO_HORSE_API_KEY="your-key"
 # From the checkout; validation needs no key or network:
 jev-decide decide skills/jev-triage/assets/example.json --dry-run
 # After editing the synthetic example and reviewing the data to be sent:
@@ -136,15 +147,22 @@ python3 /actual/skill/path/scripts/jev.py decide request.json
 Resolve installed paths relative to the loaded skill, not the host project.
 Normal decisions send supplied state/questions to the selected provider and incur usage;
 dry runs do neither. Logs may contain supplied text: keep private data out of
-public benchmark artifacts. Use `--provider openrouter` (default) or
-`--provider typesafe` explicitly; the CLI never switches providers after an error.
-The official route uses `https://api.typesafe.ai/v1/systemone` and `TYPESAFE_API_KEY`.
+public benchmark artifacts, and treat saved request/response traces as sensitive.
+Use `--provider neohorse` (this fork's default real route),
+`--provider openrouter` (CLI default) or `--provider typesafe` explicitly; the CLI
+never switches providers after an error. The NeoHorse route uses
+`https://tokenrhythm.studio/v1/decision` and `NEO_HORSE_API_KEY` with model
+`NeoHorse-Jev-4B`; the official route uses `https://api.typesafe.ai/v1/systemone`
+and `TYPESAFE_API_KEY`.
 `jev-decide setup` only reports presence and choices; it does not test credentials.
 
-Default OpenRouter model: `typesafe/jev-1.13`; official: `jev-1.13.0`.
-Explicit TypeSafe selection maps the bundled OpenRouter ID to the official ID.
-The OpenRouter API is alpha; test upgrades deliberately.
+Models per route: NeoHorse `NeoHorse-Jev-4B`; OpenRouter `typesafe/jev-1.13`;
+official `jev-1.13.0`. Explicit provider selection maps the bundled OpenRouter ID
+to that provider's model. The OpenRouter API is alpha; test upgrades deliberately.
 `--model` overrides request `model`, then `JEV_MODEL`, then the default.
+Every request is restricted to https on a documented host allowlist, and any
+address resolving into loopback/private/reserved ranges is rejected before
+sending.
 
 ## CLI behavior
 

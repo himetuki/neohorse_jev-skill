@@ -1,14 +1,19 @@
 <div align="center">
 
-# ⚡ Awesome Jev Skills
+# ⚡ NeoHorse Jev Skills
 
-**看看能做什么，挑一个让 Agent 帮你用起来。**
+**看看能做什么，挑一个让 Agent 帮你用起来——已切换到 NeoHorse-Jev-4B 决策接口。**
 
-[![Skills](https://img.shields.io/badge/skills-11-7c3aed?style=flat-square)](#install) [![Scenarios](https://img.shields.io/badge/scenarios-108-0d9488?style=flat-square)](#catalog) [![Tests](https://github.com/wuyoscar/jev-skill/actions/workflows/test.yml/badge.svg)](https://github.com/wuyoscar/jev-skill/actions/workflows/test.yml) [![MIT](https://img.shields.io/badge/license-MIT-ea580c?style=flat-square)](LICENSE)
+[![Skills](https://img.shields.io/badge/skills-11-7c3aed?style=flat-square)](#install) [![Scenarios](https://img.shields.io/badge/scenarios-108-0d9488?style=flat-square)](#catalog) [![Route](https://img.shields.io/badge/route-NeoHorse--Jev--4B-7c3aed?style=flat-square)](#no-key) [![MIT](https://img.shields.io/badge/license-MIT-ea580c?style=flat-square)](LICENSE)
 
 [English](README.md) · **简体中文**
 
 [🧭 项目导航](#projects) · [🎬 看演示](#showcase) · [📦 安装](#install) · [🚀 怎么用](#usage) · [🗂 全部 108 个场景](#catalog) · [🧪 输入 → 输出](#io) · [🆕 更新记录](docs/updates/README.md)
+
+> **复刻说明。** 本仓库把技能集合切换到 tokenrhythm.studio 上的 **NeoHorse-Jev-4B** 决策接口
+>（`--provider neohorse`，key 只从本地环境变量 `NEO_HORSE_API_KEY` 读取），并在上游
+> [wuyoscar/jev-skill](https://github.com/wuyoscar/jev-skill) v0.2.0 的基础上增加了传输加固、
+> 测试与 ZCode 实践记录。OpenRouter 与 TypeSafe 官方路由仍然保留。
 
 </div>
 
@@ -58,15 +63,15 @@ Jev 负责选择、分类和评分，agent 负责提供上下文和执行。
 <a id="install"></a>
 ## 📦 安装：复制给你的 Agent
 
-把下面这段话发给 **Codex、Claude Code 或 OpenCode**：
+把下面这段话发给你的编码 Agent（**ZCode**、Claude Code、Codex 或 OpenCode）：
 
 ```text
 帮我给当前 Agent 安装 Jev Skills，包括通用技能和全部场景技能。请读取并按照这份安装指南操作，完成后验证安装是否成功：
-https://raw.githubusercontent.com/wuyoscar/jev-skill/main/docs/install.md
+https://raw.githubusercontent.com/himetuki/neohorse_jev-skill/main/docs/install.md
 ```
 
 Agent 会检查环境，默认安装到当前项目，并完成离线验证。
-你不用自己运行命令；只需处理必要的授权。没有 key？Agent 会先让你选[OpenRouter、官方入口或明确的模拟模式](#no-key)，不会擅自切换。
+你不用自己运行命令；只需处理必要的授权。没有 key？Agent 会先让你选[NeoHorse-Jev-4B、OpenRouter、官方入口或明确的模拟模式](#no-key)，不会擅自切换。
 不需要 Vercel 账号；Node/npm 也不是默认安装方式的依赖。
 [Agent 安装指南](docs/install.md) · [手动安装与排错](docs/installation.md)
 
@@ -77,18 +82,19 @@ Agent 会检查环境，默认安装到当前项目，并完成离线验证。
 可以调用真实 Jev，也可以在你同意后，由当前 Agent 按相同标准模拟判断。
 
 <a id="no-key"></a>
-### 🔑 Setup：OpenRouter、官方 API，或者模拟
+### 🔑 Setup：NeoHorse-Jev-4B、OpenRouter、官方 API，或者模拟
 
 直接告诉 Agent：**“用 jev-setup 检查可用方式，先不要做付费调用。”**
 它只检查 key 是否存在；切换模式或数据发送对象前先问你。
 
 | 你的情况 | 下一步 |
 |---|---|
+| 使用 NeoHorse-Jev-4B 平台（基元律动 tokenrhythm.studio） | 到 https://tokenrhythm.studio 获取平台 key，本地配置 `NEO_HORSE_API_KEY`，调用时加 `--provider neohorse`。 |
 | 已经使用 OpenRouter | 到 [OpenRouter](https://openrouter.ai/settings/keys) 使用或申请 key，本地配置 `OPENROUTER_API_KEY`。 |
 | 不用 OpenRouter | 去 [TypeSafe 官方控制台](https://console.typesafe.ai)，本地配置 `TYPESAFE_API_KEY`，不必另开聚合平台账号。 |
 | 两边都没有，或不想申请 | 选 B：让当前 Agent，或你明确指定的可用模型（例如 DeepSeek）按提示词模拟。 |
 
-> **A：真实 Jev。** 选 OpenRouter 或官方 TypeSafe，在本地配置对应 key，再确认要发送的数据与 API 用量。
+> **A：真实 Jev。** 选 NeoHorse-Jev-4B、OpenRouter 或官方 TypeSafe，在本地配置对应 key，再确认要发送的数据与 API 用量。
 >
 > **B：模拟。** 使用相同上下文、候选项和标准，让当前 Agent 或你明确选择的可用模型分类。
 
@@ -100,7 +106,7 @@ Agent 会检查环境，默认安装到当前项目，并完成离线验证。
 
 `jev-decide setup` 只读检查，不联网、不登录、不保存密钥。
 `--dry-run` 只校验格式；真实调用有用量。不要把 key 发进聊天。
-真实接口分别用 `--provider openrouter` 或 `--provider typesafe`，不会自动兜底换服务。
+真实接口分别用 `--provider neohorse`、`--provider openrouter` 或 `--provider typesafe`，不会自动兜底换服务。
 [完整 Setup 技能](skills/jev-setup/SKILL.md)。
 
 ### 先跑一个例子
@@ -108,7 +114,7 @@ Agent 会检查环境，默认安装到当前项目，并完成离线验证。
 ```text
 使用 jev-triage 技能，读取它安装目录里的 assets/example.json。
 展示例子的上下文、问题和候选项。先用 jev-setup 让我选择：
-A：通过 OpenRouter 或官方 TypeSafe 调用真实 Jev；B：明确同意的 Agent 或模型模拟。等我选择再继续。
+A：通过 NeoHorse-Jev-4B、OpenRouter 或官方 TypeSafe 调用真实 Jev；B：明确同意的 Agent 或模型模拟。等我选择再继续。
 真实调用模式先带选定的 --provider 做 --dry-run，通过后做一次 Jev 调用。
 B 模式注明实际使用的 Agent 或模型，并标注“模拟，未调用 Jev”，不要编造概率。
 给我看完整输入、输出和所用模式，并解释类别和紧急程度。
@@ -180,7 +186,7 @@ Agent 应一起修改 `state`、`questions` 和 `criteria`，而不只是替换�
 jev-decide decide request.json --dry-run
 ```
 
-命令默认使用 OpenRouter；若选官方入口，给检查与调用都加上 `--provider typesafe`。
+命令默认使用 OpenRouter；NeoHorse-Jev-4B 路由给检查与调用都加上 `--provider neohorse`，官方 TypeSafe 入口加 `--provider typesafe`。
 检查通过、确认可以把这些数据发往所选服务商后，再真实调用并保存结果：
 
 ```bash
@@ -335,7 +341,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 <!-- request: examples-2026-09-20.json#checkpoint -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "goal": "Fix the CSV parser without changing the public API; verify tests before declaring done.",
     "permissions": "Read and edit this local project, run tests; no publishing.",
@@ -407,7 +413,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 <!-- request: examples-2026-09-20.json#completion -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "goal": "Run the evaluation and produce a metrics file.",
     "agent_claim": "The evaluation is complete.",
@@ -526,7 +532,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-code-review/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "goal": "Make the parser accept quoted commas without weakening its regression test.",
     "diff": {
@@ -758,7 +764,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-route/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "task": "Explain why two observed implementations disagree on concurrent writes.",
     "requirements": [
@@ -860,7 +866,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-find-code/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "question": "Where should I inspect duplicate invoice creation?",
     "candidates": {
@@ -924,7 +930,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-context/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "task": "Fix CSV parsing of quoted commas.",
     "blocks": {
@@ -1038,7 +1044,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 <!-- request: examples-2026-09-20.json#browser-route -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "goal": "Find the cancellation policy for a hotel; do not book or pay.",
     "observation_source": "Synthetic browser accessibility snapshot",
@@ -1102,7 +1108,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-ui/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "snapshot_id": "demo-12",
     "goal": "Find the cancellation policy; do not book or pay.",
@@ -1324,7 +1330,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 <!-- request: examples-2026-09-20.json#triage -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "record": "Our invoices show two charges for the same order. Checkout still works. Could someone check this today?"
   },
@@ -1388,7 +1394,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-triage/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "record_id": "ticket-07",
     "text": "The export button returns an error for all team members. We need the monthly report tomorrow.",
@@ -1661,7 +1667,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-documents/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "question": "Which address is explicitly for invoice delivery?",
     "candidates": {
@@ -1959,7 +1965,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev-simulation/assets/example.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "world": "Fictional island town",
     "goal": "Keep residents supplied while avoiding unsafe crossings.",
@@ -2027,7 +2033,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 <!-- request: examples-2026-09-20.json#rubric -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "idea": "An offline-first pantry app that turns existing ingredients into a short weekly shopping list, without requiring an account.",
     "audience": "Busy households who want less food waste.",
@@ -2170,7 +2176,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 <!-- request: scenario-smoke-2026-09-20.json#skills/jev/assets/voice-style.json -->
 ```json
 {
-  "model": "typesafe/jev-1.13",
+  "model": "NeoHorse-Jev-4B",
   "state": {
     "setting": "Fictional classroom podcast. These are scripted characters, not real people.",
     "last_line": {

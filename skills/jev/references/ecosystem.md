@@ -183,7 +183,7 @@ projects. Keep the original authors' attribution and license if reusing code.
 
 ## Expanded project directory
 
-See the [45-entry README project table](https://github.com/wuyoscar/jev-skill/blob/main/README.md#projects)
+See the [45-entry README project table](https://github.com/himetuki/neohorse_jev-skill/blob/main/README.md#projects)
 for apps, demos, reports, model alternatives and methodology references. The
 [September 21 intake](intake-2026-09-21.md) maps all 76 supplied list entries and
 records newly inspected commits. Alternative-model API compatibility is not

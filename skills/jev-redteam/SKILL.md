@@ -12,7 +12,7 @@ outcomes. Jev neither generates attack text nor establishes success by itself.
 
 ## Setup: choose the service or simulation
 
-Check only the presence of `OPENROUTER_API_KEY` and `TYPESAFE_API_KEY`; never
+Check only the presence of `OPENROUTER_API_KEY`, `TYPESAFE_API_KEY` and `NEO_HORSE_API_KEY`; never
 print credentials. Respect the user's already chosen mode. For a new setup,
 prefer the user's existing OpenRouter account; otherwise offer official TypeSafe.
 If OpenRouter is missing, explain that direct TypeSafe is also real Jev. Do not
@@ -21,7 +21,7 @@ silently change destination, send data, create an account or switch the host mod
 If no route has been chosen, explain the available routes and ask:
 
 > **A — Real Jev:** use/get an OpenRouter key at https://openrouter.ai/settings/keys
-> if you use OpenRouter; otherwise use/get a TypeSafe key at
+> if you use OpenRouter; use a NeoHorse-Jev-4B platform key from https://tokenrhythm.studio; or use/get a TypeSafe key at
 > https://console.typesafe.ai. Configure it locally, not in chat.
 > **B — Simulate:** use the current agent, or an explicitly selected available
 > model such as DeepSeek, with the same context, questions and criteria.
@@ -42,12 +42,11 @@ Never present this as Jev, calibrated probability or equivalent speed/accuracy.
 Skip Jev CLI/API steps in B; use the approved model's existing interface and do
 not install a substitute or send data elsewhere without consent.
 
-In A, select the CLI destination explicitly: `--provider openrouter` or
-`--provider typesafe`. The latter uses `TYPESAFE_API_KEY` and maps the bundled
-OpenRouter model ID to `jev-1.13.0`. `--dry-run` only validates; it neither
+In A, select the CLI destination explicitly: `--provider openrouter`, `--provider typesafe` or `--provider neohorse`. The TypeSafe route uses `TYPESAFE_API_KEY` and maps the bundled
+OpenRouter model ID to `jev-1.13.0`; the NeoHorse route uses `NEO_HORSE_API_KEY`, posts to `https://tokenrhythm.studio/v1/decision` and pins model `NeoHorse-Jev-4B`. `--dry-run` only validates; it neither
 classifies nor makes a network call. `jev-decide setup` reports presence only,
 not key validity, credits or permission. For guided setup and a copyable
-DeepSeek prompt, use `jev-setup` or the [setup guide](https://github.com/wuyoscar/jev-skill/blob/main/skills/jev-setup/SKILL.md).
+DeepSeek prompt, use `jev-setup` or the [setup guide](https://github.com/himetuki/neohorse_jev-skill/blob/main/skills/jev-setup/SKILL.md).
 
 ## Choose the workflow
 
