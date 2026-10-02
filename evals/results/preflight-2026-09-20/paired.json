@@ -1,9 +1,0 @@
-[
-  {
-    "repeat": 1,
-    "case": "goal_recovery",
-    "baseline_success": false,
-    "jev_success": false,
-    "success_delta": 0
-  }
-]

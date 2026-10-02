@@ -5,9 +5,9 @@ choose the right label, and does uncertainty identify when not to rely on it?**
 This evaluates decisions on public questions, not real autonomous execution or
 Jev's training algorithm.
 
-[September 20 results](CALIBRATION_RESULTS.md): 160 real paired items; Jev 85%
-accuracy overall. Its confidence >=0.9 subset was 92/100 correct, with strong
-task dependence. No universal execution threshold was established.
+This fork keeps the frozen protocol but **removes the upstream measured
+results**: no accuracy or calibration numbers are recorded here. Prepare and run
+the campaign yourself before citing any threshold.
 
 ## Frozen protocol
 

@@ -8,7 +8,7 @@
 
 [English](README.md) · **简体中文**
 
-[🧭 项目导航](#projects) · [🎬 看演示](#showcase) · [📦 安装](#install) · [🚀 怎么用](#usage) · [🗂 全部 108 个场景](#catalog) · [🧪 输入 → 输出](#io) · [🆕 更新记录](docs/updates/README.md)
+[🧭 项目导航](#projects) · [📦 安装](#install) · [🚀 怎么用](#usage) · [🗂 全部 108 个场景](#catalog) · [🧪 请求样例](#io)
 
 > **复刻说明。** 本仓库把技能集合切换到 tokenrhythm.studio 上的 **NeoHorse-Jev-4B** 决策接口
 >（`--provider neohorse`，key 只从本地环境变量 `NEO_HORSE_API_KEY` 读取），并在上游
@@ -19,46 +19,6 @@
 
 Jev 负责选择、分类和评分，agent 负责提供上下文和执行。
 既可以接进长程任务，也可以拿来处理消息、读文档、做游戏和创作工具。
-
-<a id="showcase"></a>
-## 🎬 别人已经做出了什么
-
-点图片看原项目或视频。素材来自原作者，不是本仓库的复现结果。
-
-<table>
-<tr>
-<td width="50%" valign="top">
-<a href="https://github.com/browser-use/jev-ultrafast"><img src="https://raw.githubusercontent.com/browser-use/jev-ultrafast/1231850a0bf1a0c0341fe408ef1668dbbfdfac46/docs/demo.gif" width="100%" alt="浏览器自己选择下一步" /></a>
-<br /><b>🌐 浏览器自己选择下一步</b><br />
-<sub>Jev 选动作，浏览器工具点击和输入。</sub><br />
-<a href="https://github.com/browser-use/jev-ultrafast">原项目 / 演示 ↗</a>
-</td>
-<td width="50%" valign="top">
-<a href="https://github.com/thelau/jev-tetris"><img src="https://raw.githubusercontent.com/thelau/jev-tetris/9869b602965cf002afff766013f8c068846d36aa/docs/stills/states/3-decided-desktop.png" width="100%" alt="把决策概率画在俄罗斯方块上" /></a>
-<br /><b>🧱 把决策概率画在俄罗斯方块上</b><br />
-<sub>代码枚举合法落点，Jev 给候选排序。</sub><br />
-<a href="https://github.com/thelau/jev-tetris">原项目 / 演示 ↗</a>
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-<a href="https://x.com/gokayfem/status/2101022590722810271"><img src="docs/media/whale-city.png" width="100%" alt="用决策维持一座鲸背城市" /></a>
-<br /><b>🐋 用决策维持一座鲸背城市</b><br />
-<sub>Astra 设定世界，Jev 决策，H3 渲染。</sub><br />
-<a href="https://x.com/gokayfem/status/2101022590722810271">原项目 / 演示 ↗</a>
-</td>
-<td width="50%" valign="top">
-<a href="https://github.com/cocktailpeanut/jevthoven"><img src="docs/media/jevthoven.png" width="100%" alt="从音乐部件编排出多轨作品" /></a>
-<br /><b>🎹 从音乐部件编排出多轨作品</b><br />
-<sub>Jev 选部件，代码渲染可编辑的 MIDI。</sub><br />
-<a href="https://github.com/cocktailpeanut/jevthoven">原项目 / 演示 ↗</a>
-</td>
-</tr>
-</table>
-
-[素材来源](docs/media/README.md) · 还可以看：[代码审查面板](https://github.com/devagrawal09/jev-review)、[语义 ⌘F](#sc-semantic-find)、[剧情监测](#sc-story-sensors)。
-
-**9 月 20 日新收录：** 语义查找、赞助口播、剧情监测、MIDI 编排、本地模型对照。[调研记录 →](docs/updates/2026-09-20.md)
 
 <a id="install"></a>
 ## 📦 安装：复制给你的 Agent
@@ -196,29 +156,28 @@ jev-decide decide request.json > result.json
 查看 `result.json`，不要只看命令是否退出。退出码 `0` 表示已选择/评分，`2` 表示需要复核，
 `1` 表示错误；选中某个动作不代表它已经执行。若只安装了通用 `jev`、没有 CLI，
 用 `python3 <实际技能目录>/scripts/jev.py` 替换 `jev-decide` 即可。
-[更多命令与排错](docs/installation.md#cli-behavior) · [直接看输入输出](#io)
+[更多命令与排错](docs/installation.md#cli-behavior) · [直接看请求样例](#io)
 
 <a id="io"></a>
-## 🧪 输入什么，实际返回什么
+## 🧪 可直接修改的请求样例
 
-下面是**合成样例调用真实 Jev API 后保存的结果**。
-先看简版；点场景名称，就能看到完整输入和对应输出。
+每个样例都是**可直接修改的合成请求模板**。
+先看简版；点场景名称，就能看到完整请求。
 
-| 拿来做什么 | 📥 输入摘录 | 📤 实际返回 |
-|---|---|---|
-| [帮卡住的 Agent 选下一步](#sc-a02) | 连续两次相同的 `UnicodeDecodeError`，期间没改源码。在检查输入、原样重试、报告完成、询问用户之间选择。 | `next_step = inspect_input`：先查输入<br />`stuck = true`，是的概率 `0.88` |
-| [给客服消息分流](#sc-h02) | “所有团队成员点击导出都报错，明天需要月报。”选择队列，并按给定的 0–2 级标准评估紧急程度。 | `queue = bug`：建议故障队列<br />`urgency = 1.29 / 2` |
-| [从文档里找对证据](#sc-spans) | `s1`：一般咨询 hello@example.invalid<br />`s2`：账单发往 accounts@example.invalid<br />哪段写了账单地址？“账单发往 s1”这个说法对吗？ | `source = s2`，概率 `0.97`<br />`claim_support = contradicted`：原文与该说法矛盾 |
+| 拿来做什么 | 📥 输入摘录 |
+|---|---|
+| [帮卡住的 Agent 选下一步](#sc-a02) | 连续两次相同的 `UnicodeDecodeError`，期间没改源码。在检查输入、原样重试、报告完成、询问用户之间选择。 |
+| [给客服消息分流](#sc-h02) | “所有团队成员点击导出都报错，明天需要月报。”选择队列，并按给定的 0–2 级标准评估紧急程度。 |
+| [从文档里找对证据](#sc-spans) | `s1`：一般咨询 hello@example.invalid<br />`s2`：账单发往 accounts@example.invalid<br />哪段写了账单地址？“账单发往 s1”这个说法对吗？ |
 
-**全部 14 组 I/O：** [失败恢复](#sc-a02) · [完成检查](#sc-a06) ·
+**全部 14 个请求样例：** [失败恢复](#sc-a02) · [完成检查](#sc-a06) ·
 [代码审查](#sc-a08) · [模型路由](#sc-a16) · [查找代码](#sc-a20) ·
 [上下文取舍](#sc-a21) · [浏览器选动作 ×2](#sc-a23) · [客服分流 ×2](#sc-h02) ·
 [文档证据](#sc-spans) · [模拟决策](#sc-a28) · [想法评分](#sc-h25) · [声音编排](#sc-tts)。
 
-每组 **Input** 都原样展示保存的请求：模型、上下文（`state`）、问题和候选项。
-**Output** 是 CLI 整理后的实际决策，链接里还有原始 API 响应和完整概率分布。
+每组 **Input** 都是可直接修改的合成请求模板：模型、上下文（`state`）、问题和候选项。
 上表中文是便于阅读的概述；下方请求保留调用时的英文。这些调用没有实际执行所选动作。
-Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2 这样的评分**不是概率**。
+Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.3/2 这样的评分**不是概率**。
 
 ## ⚡ 用好 Jev，先记住两件事
 
@@ -230,8 +189,6 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 
 这两条已写进通用技能和全部场景技能。[上下文与并发指南](skills/jev/references/context-and-throughput.md)
 · [两条记录、六个问题的模板](skills/jev/assets/batch-triage.json)（合成输入，不是实测输出）。
-
-**9 月 21 日更新：** 项目导航、18 个补充场景、Setup 与安全评测技能。[收录与验证记录 →](docs/updates/2026-09-21-collection-setup.md)
 
 <a id="projects"></a>
 ## 🧭 项目、App、评测与替代模型导航
@@ -301,7 +258,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 | 🛠️ **[数据与开发工具](#data)**<br />12 个用法 | 🎨 **[游戏与创作](#creative)**<br />12 个用法 | 🧩 **[制作自己的工具](#building)**<br />4 个用法 |
 | 🧰 **[新玩法与安全评测](#more-uses)**<br />18 个用法 | [📦 Setup 引导](skills/jev-setup/SKILL.md) | [🧪 评测技能](skills/jev-redteam/SKILL.md) |
 
-**怎么读：** 🧪 实际输出有保存的 API 记录；🛠 模板是可改输入，不是完整应用；🎬 社区演示归原作者。每节都注明验证状态。
+**怎么读：** 🛠 每个样例都是可改的合成模板，不是保存的运行记录。每节都注明证据与复核状态。
 
 第一个完整 I/O：[从失败循环里脱困 ↓](#sc-a02)。[概率和评分有什么区别](skills/jev/references/calibration.md)。
 
@@ -332,9 +289,9 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 - **可以改：** 重复失败窗口、可用诊断工具、重试上限；没有新证据就别无限重试。
 - **动手：** [jev](skills/jev/SKILL.md) · [改写这个模板](skills/jev/assets/checkpoint.json)。
 - **来源：** [R02](skills/jev/references/community.md#r02) · [P03](skills/jev/references/community.md#p03)
-- **状态：** 下方展示合成输入的真实 API 返回；尚未评估这条工作流的端到端效果。
+- **状态：** 合成请求模板；本复刻未记录该工作流的运行结果。
 
-**🧪 实测 I/O** — CSV 解析器连续两次出现同一 UnicodeDecodeError，两次运行间没有改源码。
+**🧪 请求模板** — CSV 解析器连续两次出现同一 UnicodeDecodeError，两次运行间没有改源码。
 
 **📥 Input · 完整请求**
 
@@ -373,26 +330,6 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 }
 ```
 
-**📤 Output · 实际返回（CLI 整理）**
-
-<!-- receipt: examples-2026-09-20.json#checkpoint -->
-```json
-{
-  "next_step": {
-    "status": "selected",
-    "value": "inspect_input",
-    "probability": 1,
-    "margin": 1
-  },
-  "stuck": {
-    "status": "selected",
-    "value": true,
-    "probability": 0.88
-  }
-}
-```
-
-[原始请求与完整响应](evals/results/examples-2026-09-20.json)
 
 <a id="sc-a06"></a>
 <!-- covers: A06 H13 -->
@@ -404,9 +341,9 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 - **可以改：** 完成标准、回执新鲜度、必测项；通过日志必须属于当前版本。
 - **动手：** [jev](skills/jev/SKILL.md) · [改写这个模板](skills/jev/assets/completion.json)。
 - **来源：** [P03](skills/jev/references/community.md#p03) · [N01](skills/jev/references/community.md#n01)
-- **状态：** 下方展示合成输入的真实 API 返回；尚未评估这条工作流的端到端效果。
+- **状态：** 合成请求模板；本复刻未记录该工作流的运行结果。
 
-**🧪 实测 I/O** — 任务只是入队，尚未执行，metrics 文件不存在，但 agent 声称完成。
+**🧪 请求模板** — 任务只是入队，尚未执行，metrics 文件不存在，但 agent 声称完成。
 
 **📥 Input · 完整请求**
 
@@ -448,26 +385,6 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 }
 ```
 
-**📤 Output · 实际返回（CLI 整理）**
-
-<!-- receipt: examples-2026-09-20.json#completion -->
-```json
-{
-  "claim_supported": {
-    "status": "selected",
-    "value": false,
-    "probability": 0.02
-  },
-  "next_step": {
-    "status": "selected",
-    "value": "check_job",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[原始请求与完整响应](evals/results/examples-2026-09-20.json)
 
 **PR 合并资格预审：** 输入必需检查、真实 CI 回执和评审状态，分类为条件满足、缺项或需复核。分支保护和权限由代码执行；Jev 不负责合并。这是未测试的流程改编。
 
@@ -523,9 +440,9 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 - **可以改：** 受保护断言、合法测试改动的例外；标记线索，不判断主观作弊意图。
 - **动手：** [jev-code-review](skills/jev-code-review/SKILL.md) · [改写这个模板](skills/jev-code-review/assets/example.json)。
 - **来源：** [P03](skills/jev/references/community.md#p03)
-- **状态：** [真实合成示例](evals/SCENARIO_EXAMPLES.md)：削弱测试命题为 0.97；不是端到端审查基准。
+- **状态：** 模板用于隔离被削弱的断言；不是端到端审查基准。
 
-**🧪 实测 I/O** — 把原断言换成 assert True，只运行了被削弱的测试。
+**🧪 请求模板** — 把原断言换成 assert True，只运行了被削弱的测试。
 
 **📥 Input · 完整请求**
 
@@ -573,30 +490,6 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 }
 ```
 
-**📤 Output · 实际返回（CLI 整理）**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-code-review/assets/example.json -->
-```json
-{
-  "weakens_test": {
-    "status": "selected",
-    "value": true,
-    "probability": 0.97
-  },
-  "completion": {
-    "status": "selected",
-    "value": "unsupported",
-    "probability": 1,
-    "margin": 1
-  },
-  "review_priority": {
-    "status": "scored",
-    "value": 1.97
-  }
-}
-```
-
-[原始请求与完整响应](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-a09"></a>
 <!-- covers: A09 -->
@@ -636,10 +529,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 
 **可以这样测：** 保持工单事实和正确部门不变，分别输入原文、直接要求改答案的
 版本，以及伪称“主管已经决定转给另一部门”的版本；分别统计错误路由和转人工率。
-[一份作者公开的配对评测](docs/updates/2026-09-21.md#decision-failures)中，直接覆盖指令
-在 200 个工单里有 1 个把答案导向攻击者目标，伪造主管决定则是 147/200。
-这是外部结果，不是我们的复现，也不是对上面检测器的测试。输出格式固定，不代表
-决策不会被诱导。
+输出格式固定，不代表决策不会被诱导；依赖检测器前请跑自己的红队测试。
 
 <a id="sc-a12"></a>
 <!-- covers: A12 H12 -->
@@ -755,9 +645,9 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 - **可以改：** 质量底线、延迟、缓存切换成本；最终要测任务结果。
 - **动手：** [jev-route](skills/jev-route/SKILL.md) · [改写这个模板](skills/jev-route/assets/example.json)。
 - **来源：** [R04](skills/jev/references/community.md#r04) · [R11](skills/jev/references/community.md#r11) · [N04](skills/jev/references/community.md#n04) · [Jev Codex Router](https://github.com/0xNatoshi/jev-codex-router)
-- **状态：** 下方展示合成输入的真实 API 返回；尚未评估这条工作流的端到端效果。
+- **状态：** 合成请求模板；本复刻未记录该工作流的运行结果。
 
-**🧪 实测 I/O** — 解释并发写入实现的差异；候选是 quick、reasoning、human。
+**🧪 请求模板** — 解释并发写入实现的差异；候选是 quick、reasoning、human。
 
 **📥 Input · 完整请求**
 
@@ -792,21 +682,6 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 }
 ```
 
-**📤 Output · 实际返回（CLI 整理）**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-route/assets/example.json -->
-```json
-{
-  "route": {
-    "status": "selected",
-    "value": "reasoning",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[原始请求与完整响应](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-a17"></a>
 <!-- covers: A17 -->
@@ -857,9 +732,9 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 - **可以改：** 目录提示、遍历深度、停止证据；路径相关不代表找到了 bug。
 - **动手：** [jev-find-code](skills/jev-find-code/SKILL.md) · [改写这个模板](skills/jev-find-code/assets/example.json)。
 - **来源：** [R12](skills/jev/references/community.md#r12) · [Blink path search](https://github.com/ellipsis-dev/blink)
-- **状态：** 下方展示合成输入的真实 API 返回；尚未评估这条工作流的端到端效果。
+- **状态：** 合成请求模板；本复刻未记录该工作流的运行结果。
 
-**🧪 实测 I/O** — 调查重复发票：p1 是 billing/invoices.py，p2 是 ui/theme.py，并附有功能摘要。
+**🧪 请求模板** — 调查重复发票：p1 是 billing/invoices.py，p2 是 ui/theme.py，并附有功能摘要。
 
 **📥 Input · 完整请求**
 
@@ -895,21 +770,6 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 }
 ```
 
-**📤 Output · 实际返回（CLI 整理）**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-find-code/assets/example.json -->
-```json
-{
-  "next_file": {
-    "status": "selected",
-    "value": "p1",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[原始请求与完整响应](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-a21"></a>
 <!-- covers: A21 -->
@@ -921,9 +781,9 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 - **可以改：** 误删代价、必须保留的错误、原文检索方式；完整输出单独保存。
 - **动手：** [jev-context](skills/jev-context/SKILL.md) · [改写这个模板](skills/jev-context/assets/example.json)。
 - **来源：** [R06](skills/jev/references/community.md#r06) · [P02](skills/jev/references/community.md#p02) · [N05](skills/jev/references/community.md#n05) · [winnow / VINNOW lead](https://github.com/GhalebDweikat/winnow)
-- **状态：** [真实合成示例](evals/SCENARIO_EXAMPLES.md)：需要故障块、不需要主题备注；未执行上下文改写。
+- **状态：** 模板用于隔离故障块而非主题备注；未执行上下文改写。
 
-**🧪 实测 I/O** — b1 是引号内逗号导致的解析错误，b2 是主题配色帮助；故障调查还没结束。
+**🧪 请求模板** — b1 是引号内逗号导致的解析错误，b2 是主题配色帮助；故障调查还没结束。
 
 **📥 Input · 完整请求**
 
@@ -970,31 +830,6 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 }
 ```
 
-**📤 Output · 实际返回（CLI 整理）**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-context/assets/example.json -->
-```json
-{
-  "b1_needed": {
-    "status": "selected",
-    "value": true,
-    "probability": 0.91
-  },
-  "b2_needed": {
-    "status": "selected",
-    "value": false,
-    "probability": 0.03
-  },
-  "compact_now": {
-    "status": "selected",
-    "value": "ongoing",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[原始请求与完整响应](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-a22"></a>
 <!-- covers: A22 -->
@@ -1018,7 +853,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 - **可以改：** 压力曲线、冷却时间、误触发代价、提示/自动模式；压缩后是否还保留所需信息要单独测。
 - **动手：** [jev-context](skills/jev-context/SKILL.md) · [改写这个模板](skills/jev-context/assets/example.json)。
 - **来源：** [compact-adviser](https://github.com/kunchenguid/compact-adviser)
-- **状态：** 上游描述了小规模/私有标签调试；本仓库上下文例子返回 ongoing，没有实际压缩。
+- **状态：** 上游描述了小规模/私有标签调试；本复刻未记录上下文压缩运行。
 
 <a id="interaction"></a>
 ## 🌐 浏览器、桌面与交互工具
@@ -1035,9 +870,9 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 - **可以改：** 允许的动作、目标条件、观察新鲜度；浏览器由宿主执行。
 - **动手：** [jev-ui](skills/jev-ui/SKILL.md) · [改写这个模板](skills/jev-ui/assets/example.json)。
 - **来源：** [P05](skills/jev/references/community.md#p05) · [Jev Ultrafast](https://github.com/browser-use/jev-ultrafast)
-- **状态：** [真实合成示例](evals/SCENARIO_EXAMPLES.md)：选出 `open_policy`，未执行浏览器动作；Ultrafast 速度来自作者演示。
+- **状态：** 模板用于选择策略动作；未执行浏览器动作；Ultrafast 速度来自作者演示。
 
-**🧪 实测 I/O** — 合成页面：取消政策链接 e12、付款按钮 e13、照片 e14；任务只读。
+**🧪 请求模板** — 合成页面：取消政策链接 e12、付款按钮 e13、照片 e14；任务只读。
 
 **📥 Input · 完整请求**
 
@@ -1085,23 +920,8 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 }
 ```
 
-**📤 Output · 实际返回（CLI 整理）**
 
-<!-- receipt: examples-2026-09-20.json#browser-route -->
-```json
-{
-  "next_step": {
-    "status": "selected",
-    "value": "read_policy",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[原始请求与完整响应](evals/results/examples-2026-09-20.json)
-
-**🧪 实测 I/O** — 另一合成页面：政策链接 e1、付款按钮 e2；允许动作是 open_policy、wait、blocked。
+**🧪 请求模板** — 另一合成页面：政策链接 e1、付款按钮 e2；允许动作是 open_policy、wait、blocked。
 
 **📥 Input · 完整请求**
 
@@ -1143,21 +963,6 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 }
 ```
 
-**📤 Output · 实际返回（CLI 整理）**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-ui/assets/example.json -->
-```json
-{
-  "action": {
-    "status": "selected",
-    "value": "open_policy",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[原始请求与完整响应](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-a24"></a>
 <!-- covers: A24 -->
@@ -1321,9 +1126,9 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 - **可以改：** 队列职责、多问题处理、例外；每条记录保留独立 ID。
 - **动手：** [jev-triage](skills/jev-triage/SKILL.md) · [改写这个模板](skills/jev-triage/assets/example.json)。
 - **来源：** [P04](skills/jev/references/community.md#p04)
-- **状态：** [真实合成示例](evals/SCENARIO_EXAMPLES.md)：故障队列、紧急分 1.29/2；未测批量路由。
+- **状态：** 模板用于隔离队列与紧急度判断；未测批量路由。
 
-**🧪 实测 I/O** — 同一订单被扣款两次，但结账仍可用，客户希望当天核查。
+**🧪 请求模板** — 同一订单被扣款两次，但结账仍可用，客户希望当天核查。
 
 **📥 Input · 完整请求**
 
@@ -1362,32 +1167,8 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 }
 ```
 
-**📤 Output · 实际返回（CLI 整理）**
 
-<!-- receipt: examples-2026-09-20.json#triage -->
-```json
-{
-  "category": {
-    "status": "selected",
-    "value": "billing",
-    "probability": 1,
-    "margin": 1
-  },
-  "needs_human": {
-    "status": "selected",
-    "value": true,
-    "probability": 0.91
-  },
-  "urgency": {
-    "status": "scored",
-    "value": 1
-  }
-}
-```
-
-[原始请求与完整响应](evals/results/examples-2026-09-20.json)
-
-**🧪 实测 I/O** — 所有团队成员导出都报错，明天需要月报。
+**🧪 请求模板** — 所有团队成员导出都报错，明天需要月报。
 
 **📥 Input · 完整请求**
 
@@ -1428,25 +1209,6 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 }
 ```
 
-**📤 Output · 实际返回（CLI 整理）**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-triage/assets/example.json -->
-```json
-{
-  "queue": {
-    "status": "selected",
-    "value": "bug",
-    "probability": 1,
-    "margin": 1
-  },
-  "urgency": {
-    "status": "scored",
-    "value": 1.29
-  }
-}
-```
-
-[原始请求与完整响应](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-h03"></a>
 <!-- covers: H03 -->
@@ -1658,9 +1420,9 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 - **可以改：** 字段角色、候选提取方式、格式归一化；候选里没有的值不能凭空找回。
 - **动手：** [jev-documents](skills/jev-documents/SKILL.md) · [改写这个模板](skills/jev-documents/assets/example.json)。
 - **来源：** [Official span extraction](https://docs.typesafe.ai/cookbooks/pre_parsed_value_extraction_cookbook)
-- **状态：** [真实合成示例](evals/SCENARIO_EXAMPLES.md)：选出 s2（0.97），同时指出主张与原文矛盾；未测 OCR 或检索。
+- **状态：** 模板用于隔离片段选择与主张核对；未测 OCR 或检索。
 
-**🧪 实测 I/O** — s1 是通用邮箱 hello@example.invalid，s2 是账单邮箱 accounts@example.invalid；待核验主张把 s1 当作账单邮箱。
+**🧪 请求模板** — s1 是通用邮箱 hello@example.invalid，s2 是账单邮箱 accounts@example.invalid；待核验主张把 s1 当作账单邮箱。
 
 **📥 Input · 完整请求**
 
@@ -1699,27 +1461,6 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 }
 ```
 
-**📤 Output · 实际返回（CLI 整理）**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-documents/assets/example.json -->
-```json
-{
-  "source": {
-    "status": "selected",
-    "value": "s2",
-    "probability": 0.97,
-    "margin": 0.94
-  },
-  "claim_support": {
-    "status": "selected",
-    "value": "contradicted",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[原始请求与完整响应](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-suitability"></a>
 <!-- covers: M02 -->
@@ -1956,9 +1697,9 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 - **可以改：** 角色性格、目标、行动预算、进度指标；不要假装知道隐藏状态。
 - **动手：** [jev-simulation](skills/jev-simulation/SKILL.md) · [改写这个模板](skills/jev-simulation/assets/example.json)。
 - **来源：** [R10](skills/jev/references/community.md#r10) · [X01](skills/jev/references/twitter-workflows.md#x01) · [X03](skills/jev/references/twitter-workflows.md#x03) · [R03](skills/jev/references/community.md#r03)
-- **状态：** [真实合成示例](evals/SCENARIO_EXAMPLES.md)：检查仓库；未运行状态更新或测胜率。
+- **状态：** 模板用于隔离仓库检查；未运行状态更新或测胜率。
 
-**🧪 实测 I/O** — 食物还剩两天，桥因风暴关闭，同岸有可到达的仓库；策略是先找本地补给。
+**🧪 请求模板** — 食物还剩两天，桥因风暴关闭，同岸有可到达的仓库；策略是先找本地补给。
 
 **📥 Input · 完整请求**
 
@@ -1995,21 +1736,6 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 }
 ```
 
-**📤 Output · 实际返回（CLI 整理）**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-simulation/assets/example.json -->
-```json
-{
-  "action": {
-    "status": "selected",
-    "value": "inspect_warehouse",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[原始请求与完整响应](evals/results/scenario-smoke-2026-09-20.json)
 
 **你贴的游戏玩法也保留了：** Doom、50 局并发地铁跑酷、Minecraft、超级马里奥、杀戮尖塔 2。各自把可见游戏状态变成合法动作，独立游戏可以并行，有依赖的连续动作不能抢跑。[Mario README](https://github.com/fhshaik/typesafe-mario) 已读：输入是模拟器 RAM / 遥测，不是截图。其余游戏与时间、费用数字保留在[来源记录](skills/jev/references/intake-2026-09-21.md)，未复现。
 
@@ -2024,9 +1750,9 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 - **可以改：** 维度、可观察锚点、讨论目的；不是生意成功率或投资预测。
 - **动手：** [jev](skills/jev/SKILL.md) · [改写这个模板](skills/jev/assets/rubric.json)。
 - **来源：** [P10](skills/jev/references/community.md#p10)
-- **状态：** 下方展示合成输入的真实 API 返回；尚未评估这条工作流的端到端效果。
+- **状态：** 合成请求模板；本复刻未记录该工作流的运行结果。
 
-**🧪 实测 I/O** — 为忙碌家庭设计离线优先的食材应用；有目标人群，但尚无用户或市场验证。
+**🧪 请求模板** — 为忙碌家庭设计离线优先的食材应用；有目标人群，但尚无用户或市场验证。
 
 **📥 Input · 完整请求**
 
@@ -2062,25 +1788,6 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 }
 ```
 
-**📤 Output · 实际返回（CLI 整理）**
-
-<!-- receipt: examples-2026-09-20.json#rubric -->
-```json
-{
-  "audience_fit": {
-    "status": "scored",
-    "value": 1.98
-  },
-  "validation": {
-    "status": "selected",
-    "value": "untested",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[原始请求与完整响应](evals/results/examples-2026-09-20.json)
 
 <a id="sc-h28"></a>
 <!-- covers: H28 -->
@@ -2107,7 +1814,7 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 **改编示意，不是实测输出：** 问题 + 数据说明 + 视图定义 → `chart` / `table` / `none`
 → 已有渲染组件。同一状态下互不依赖的展示问题可以放进一次请求；固定回退方案和
 必需内容不交给模型决定。上游示例使用服务端 TypeSafe key；我们未安装该库，也未
-验证它的阈值。[上下文、批量判断与 live/replay 说明](docs/updates/2026-09-21.md#react-views)。
+验证它的阈值。
 
 <a id="sc-reweight"></a>
 <!-- covers: M07 -->
@@ -2167,9 +1874,9 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 - **可以改：** 语气标签、声线映射、平滑切换、中性兜底；不是对真人内心情绪的诊断。
 - **动手：** [jev](skills/jev/SKILL.md) · [改写这个模板](skills/jev/assets/voice-style.json)。
 - **来源：** [Creator report](https://x.com/greenhill_pharm/status/2101492328137711891)
-- **状态：** [真实合成示例](evals/SCENARIO_EXAMPLES.md)：analyst + calm；没有生成语音。
+- **状态：** 模板用于隔离说话人与风格选择；没有生成语音。
 
-**🧪 实测 I/O** — 虚构播客里主持人请分析员解释相互矛盾的证据，选择下一位角色和表达语气。
+**🧪 请求模板** — 虚构播客里主持人请分析员解释相互矛盾的证据，选择下一位角色和表达语气。
 
 **📥 Input · 完整请求**
 
@@ -2213,27 +1920,6 @@ Noul 的 `probability` 始终是 **P(true)**，即使 `value` 为 false；1.29/2
 }
 ```
 
-**📤 Output · 实际返回（CLI 整理）**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev/assets/voice-style.json -->
-```json
-{
-  "speaker": {
-    "status": "selected",
-    "value": "analyst",
-    "probability": 1,
-    "margin": 1
-  },
-  "delivery": {
-    "status": "selected",
-    "value": "calm",
-    "probability": 0.98,
-    "margin": 0.96
-  }
-}
-```
-
-[原始请求与完整响应](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-negotiation"></a>
 <!-- covers: X06 -->
@@ -2573,10 +2259,8 @@ Jev 本身不浏览、不执行工具，也不生成自由文本。判断输入�
 <a id="experiments"></a>
 ## 🧪 可以查看的实验
 
-- [Agent 使用前后对照](evals/RESULTS.md)：12 组，baseline 12/12，固定检查点 10/12；是该接入策略的小规模负面结果。
-- [决策/校准试验](evals/CALIBRATION_RESULTS.md)：160 题命中 136 题；置信度 ≥0.9 的 100 题仍错了 8 题。
-- [9 个场景 API 示例](evals/SCENARIO_EXAMPLES.md)：记录了 8 个场景技能和声音编排的实际返回，没有执行宿主动作。
-- [此前的 5 个真实 API 示例](evals/results/examples-2026-09-20.json)：保留请求/响应，是冒烟回执，不是场景准确率测试。
+- [配对检查点试验框架](evals/README.md)：Jev 建议前后对照的协议与运行器。本复刻不含实测结果；自己跑一遍产生回执。
+- [决策/校准协议](evals/CALIBRATION.md)：冻结的 BBH 采样与 0.9/0.7 升级分档。此处不记录校准数值。
 - [验证与复现说明](docs/validation.md)：分别记录打包检查、离线运行，以及尚未验证的宿主边界。
 
 ## 🔗 更多资料 · 致谢

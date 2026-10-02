@@ -223,9 +223,8 @@ A first-use prompt to offer:
 
 [CLI options, provider setup, manual paths and compatibility](installation.md).
 The optional `npx skills` route there is just another way to copy skills; it is
-not a Vercel runtime dependency. Dated upstream notes under `docs/updates/` and
-`docs/experiments/` are historical records of the upstream project and were not
-rewritten for this fork.
+not a Vercel runtime dependency. Upstream's dated run records were removed in
+this fork because they were measurements this fork did not perform.
 
 ## Verify the selected provider without spending
 

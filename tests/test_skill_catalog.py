@@ -192,21 +192,16 @@ class SkillCatalogTests(unittest.TestCase):
             self.assertEqual(len(counts), 10)
             self.assertEqual(sum(map(int, counts)), len(numbers))
 
-    def test_showcase_has_attributed_previews_and_existing_local_media(self):
+    def test_readmes_carry_no_measured_media_or_showcase(self):
+        # The fork removed upstream's demo gallery, media files and dated run
+        # notes: nothing presents a run this fork did not perform.
         for filename in ("README.md", "README.zh.md"):
             text = (ROOT / filename).read_text()
-            gallery = text.split('<a id="showcase"></a>', 1)[1].split(
-                '<a id="install"></a>', 1
-            )[0]
-            previews = re.findall(r'<a href="https://[^"]+"><img src="([^"]+)"', gallery)
-            self.assertEqual(len(previews), 4)
-            for source in previews:
-                if not source.startswith("https://"):
-                    self.assertTrue((ROOT / source).is_file(), source)
-            self.assertIn("docs/media/README.md", gallery)
-            self.assertIn("docs/updates/2026-09-20.md", gallery)
-        self.assertTrue((ROOT / "docs/media/README.md").is_file())
-        self.assertTrue((ROOT / "docs/updates/2026-09-20.md").is_file())
+            self.assertNotIn('<a id="showcase"></a>', text)
+            self.assertNotIn("docs/media", text)
+        self.assertFalse((ROOT / "docs/media").exists())
+        self.assertFalse((ROOT / "docs/updates").exists())
+        self.assertFalse((ROOT / "evals/results").exists())
 
     def test_daily_additions_are_visible_in_both_languages(self):
         for filename in ("README.md", "README.zh.md"):
@@ -217,54 +212,29 @@ class SkillCatalogTests(unittest.TestCase):
                            "sc-midi", "sc-local-comparison"):
                 self.assertIn(f'<a id="{anchor}"></a>', text)
 
-    def test_readme_inputs_match_saved_requests_and_pair_with_outputs(self):
-        expected = {}
-        for filename in ("examples-2026-09-20.json", "scenario-smoke-2026-09-20.json"):
-            receipt = json.loads((ROOT / "evals/results" / filename).read_text())
-            for result in receipt["results"]:
-                expected[f"{filename}#{result['example']}"] = result["request"]
+    def test_readme_requests_are_self_contained_templates(self):
+        # Upstream run receipts were removed from this fork: the READMEs show
+        # editable request templates only, with no recorded outputs.
         for filename in ("README.md", "README.zh.md"):
             text = (ROOT / filename).read_text()
-            shown = re.findall(
-                r"<!-- request: (.*?) -->\s*```json\n(.*?)\n```", text, re.S
-            )
-            self.assertEqual(len(shown), len(expected))
-            self.assertEqual({key for key, _ in shown}, set(expected))
-            markers = re.findall(r"<!-- (request|receipt): (.*?) -->", text)
-            self.assertEqual(len(markers), 2 * len(expected))
-            for index in range(0, len(markers), 2):
-                self.assertEqual(markers[index][0], "request")
-                self.assertEqual(markers[index + 1], ("receipt", markers[index][1]))
+            self.assertNotIn("<!-- receipt:", text)
+            shown = re.findall(r"<!-- request: (.*?) -->\s*```json\n(.*?)\n```", text, re.S)
+            self.assertEqual(len(shown), 14)
             for key, payload in shown:
                 with self.subTest(readme=filename, request=key):
-                    shown_request = json.loads(payload)
-                    saved_request = dict(expected[key])
-                    # This fork retargets the bundled examples at the
-                    # NeoHorse-Jev-4B route, while receipts keep the model the
-                    # upstream runs actually sent; compare everything else.
-                    self.assertEqual(shown_request.pop("model"), jev.NEOHORSE_MODEL)
-                    self.assertEqual(saved_request.pop("model"), "typesafe/jev-1.13")
-                    self.assertEqual(shown_request, saved_request)
+                    request = json.loads(payload)
+                    self.assertEqual(request.get("model"), jev.NEOHORSE_MODEL)
+                    self.assertTrue(request.get("state"))
+                    self.assertTrue(request.get("questions"))
 
-    def test_readme_outputs_match_all_saved_example_receipts(self):
-        expected = {}
-        for filename in ("examples-2026-09-20.json", "scenario-smoke-2026-09-20.json"):
-            receipt = json.loads((ROOT / "evals/results" / filename).read_text())
-            for result in receipt["results"]:
-                expected[f"{filename}#{result['example']}"] = {
-                    question: {key: value for key, value in decision.items() if key != "levels"}
-                    for question, decision in result["decisions"].items()
-                }
+    def test_readmes_do_not_quote_measured_results(self):
+        banned = ("evals/results", "evals/RESULTS.md", "evals/CALIBRATION_RESULTS.md",
+                  "evals/SCENARIO_EXAMPLES.md", "docs/updates", "docs/media")
         for filename in ("README.md", "README.zh.md"):
             text = (ROOT / filename).read_text()
-            shown = re.findall(
-                r"<!-- receipt: (.*?) -->\s*```json\n(.*?)\n```", text, re.S
-            )
-            self.assertEqual(len(shown), len(expected))
-            self.assertEqual({key for key, _ in shown}, set(expected))
-            for key, output in shown:
-                with self.subTest(readme=filename, receipt=key):
-                    self.assertEqual(json.loads(output), expected[key])
+            for target in banned:
+                with self.subTest(readme=filename, target=target):
+                    self.assertNotIn(target, text)
 
 
 if __name__ == "__main__":

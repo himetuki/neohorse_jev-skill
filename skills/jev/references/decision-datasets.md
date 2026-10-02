@@ -1,8 +1,9 @@
 # Decision and calibration datasets
 
 Source check: **2026-09-20**. This is a dataset menu and test design, not a claim
-that all these experiments ran. Only the [BBH pilot](https://github.com/himetuki/neohorse_jev-skill/blob/main/evals/CALIBRATION_RESULTS.md)
-has completed here. Static decision accuracy is not agent task success.
+that all these experiments ran. This fork records no completed pilot numbers;
+run the [BBH protocol](https://github.com/himetuki/neohorse_jev-skill/blob/main/evals/CALIBRATION.md)
+yourself before citing any result. Static decision accuracy is not agent task success.
 
 ## Current pilot: 160 BBH decisions
 

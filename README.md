@@ -8,7 +8,7 @@
 
 [English](README.md) · [简体中文](README.zh.md)
 
-[🧭 Projects](#projects) · [🎬 Demos](#showcase) · [📦 Install](#install) · [🚀 How to use](#usage) · [🗂 All 108 scenarios](#catalog) · [🧪 Input → output](#io) · [🆕 Updates](docs/updates/README.md)
+[🧭 Projects](#projects) · [📦 Install](#install) · [🚀 How to use](#usage) · [🗂 All 108 scenarios](#catalog) · [🧪 Request examples](#io)
 
 > **Fork notice.** This repository repoints the collection at the **NeoHorse-Jev-4B**
 > decision endpoint on tokenrhythm.studio (`--provider neohorse`; key `NEO_HORSE_API_KEY`
@@ -20,46 +20,6 @@
 
 Jev chooses, classifies and scores. Your agent supplies the context and does the work.
 Use it in an agent loop, or on your own inbox, documents and creative projects.
-
-<a id="showcase"></a>
-## 🎬 See what people are building
-
-Community demos, linked to their authors. These are not our test runs.
-
-<table>
-<tr>
-<td width="50%" valign="top">
-<a href="https://github.com/browser-use/jev-ultrafast"><img src="https://raw.githubusercontent.com/browser-use/jev-ultrafast/1231850a0bf1a0c0341fe408ef1668dbbfdfac46/docs/demo.gif" width="100%" alt="A browser that picks its next move" /></a>
-<br /><b>🌐 A browser that picks its next move</b><br />
-<sub>Jev selects; browser tools click and type.</sub><br />
-<a href="https://github.com/browser-use/jev-ultrafast">Original / demo ↗</a>
-</td>
-<td width="50%" valign="top">
-<a href="https://github.com/thelau/jev-tetris"><img src="https://raw.githubusercontent.com/thelau/jev-tetris/9869b602965cf002afff766013f8c068846d36aa/docs/stills/states/3-decided-desktop.png" width="100%" alt="Tetris you can read as probabilities" /></a>
-<br /><b>🧱 Tetris you can read as probabilities</b><br />
-<sub>Code enumerates placements; Jev ranks them.</sub><br />
-<a href="https://github.com/thelau/jev-tetris">Original / demo ↗</a>
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-<a href="https://x.com/gokayfem/status/2101022590722810271"><img src="docs/media/whale-city.png" width="100%" alt="A city on a whale, driven by decisions" /></a>
-<br /><b>🐋 A city on a whale, driven by decisions</b><br />
-<sub>Astra builds the world; Jev acts; H3 renders.</sub><br />
-<a href="https://x.com/gokayfem/status/2101022590722810271">Original / demo ↗</a>
-</td>
-<td width="50%" valign="top">
-<a href="https://github.com/cocktailpeanut/jevthoven"><img src="docs/media/jevthoven.png" width="100%" alt="Music assembled from musical choices" /></a>
-<br /><b>🎹 Music assembled from musical choices</b><br />
-<sub>Jev picks parts; code renders editable MIDI.</sub><br />
-<a href="https://github.com/cocktailpeanut/jevthoven">Original / demo ↗</a>
-</td>
-</tr>
-</table>
-
-[Media credits](docs/media/README.md) · Also explore [code-review dashboards](https://github.com/devagrawal09/jev-review), [semantic ⌘F](#sc-semantic-find) and [story sensors](#sc-story-sensors).
-
-**September 20:** added semantic find, sponsor segments, story sensors, MIDI composition and local-model comparisons. [Research notes →](docs/updates/2026-09-20.md)
 
 <a id="install"></a>
 ## 📦 Install: give this to your agent
@@ -207,33 +167,33 @@ Read `result.json`, not just the process exit code. Exit `0` means selected/scor
 `2` means review, and `1` means error; selecting an action does not execute it.
 If you installed only the general `jev` skill without the CLI, replace `jev-decide`
 with `python3 <actual-skill-directory>/scripts/jev.py`.
-[More commands and troubleshooting](docs/installation.md#cli-behavior) · [See input/output pairs](#io)
+[More commands and troubleshooting](docs/installation.md#cli-behavior) · [See request examples](#io)
 
 **Setup and safety evaluation:** [`jev-setup`](skills/jev-setup/SKILL.md) chooses a route; [`jev-redteam`](skills/jev-redteam/SKILL.md) supplies [batch / multi-turn / team examples](skills/jev-redteam/references/workflows.md).
 
 <a id="io"></a>
-## 🧪 What goes in, what comes out
+## 🧪 Request examples you can edit
 
-These are **saved results from real Jev calls on synthetic examples**. Here is the
-short version; each link opens the full input and output below.
+Each example is a **synthetic, editable request template**. Here is the short
+version; each link opens the full request below.
 
-| Try it on… | 📥 Input excerpt | 📤 Observed output |
-|---|---|---|
-| [A stuck agent](#sc-a02) | “Same UnicodeDecodeError, twice. No source change between runs.” Choose: inspect the input, retry unchanged, report done or ask the user. | `next_step = inspect_input`<br />`stuck = true`, yes-probability `0.88` |
-| [A support ticket](#sc-h02) | “The export button returns an error for all team members. We need the monthly report tomorrow.” Choose a queue and rate urgency. | `queue = bug`<br />`urgency = 1.29 / 2` |
-| [A document](#sc-spans) | `s1`: General questions: hello@example.invalid<br />`s2`: Send invoices to accounts@example.invalid<br />Which span is for invoice delivery? Does the claim naming `s1` hold? | `source = s2`, probability `0.97`<br />`claim_support = contradicted` |
+| Try it on… | 📥 Input excerpt |
+|---|---|
+| [A stuck agent](#sc-a02) | “Same UnicodeDecodeError, twice. No source change between runs.” Choose: inspect the input, retry unchanged, report done or ask the user. |
+| [A support ticket](#sc-h02) | “The export button returns an error for all team members. We need the monthly report tomorrow.” Choose a queue and rate urgency. |
+| [A document](#sc-spans) | `s1`: General questions: hello@example.invalid<br />`s2`: Send invoices to accounts@example.invalid<br />Which span is for invoice delivery? Does the claim naming `s1` hold? |
 
-**All 14 I/O pairs:** [recovery](#sc-a02) · [completion](#sc-a06) ·
+**All 14 request templates:** [recovery](#sc-a02) · [completion](#sc-a06) ·
 [code review](#sc-a08) · [model routing](#sc-a16) · [file search](#sc-a20) ·
 [context](#sc-a21) · [browser choices ×2](#sc-a23) · [support triage ×2](#sc-h02) ·
 [document evidence](#sc-spans) · [simulation](#sc-a28) · [idea rubric](#sc-h25) · [voice direction](#sc-tts).
 
-Each **Input** block reproduces the saved request: model, context (`state`), questions
-and candidate definitions. Each **Output** block shows the CLI-normalized decisions;
-the linked receipt also contains the raw API response and distributions. The requests
-remain in their original English. These calls did not execute the chosen actions.
+Each **Input** block is an editable, synthetic request template: model, context
+(`state`), questions and candidate definitions. The requests remain in their
+original English. Validate with `--dry-run`, or send to the selected provider after
+approval. These calls did not execute the chosen actions.
 For Noul, `probability` means **P(true)** even when `value` is false; a rubric score
-such as 1.29/2 is **not** a probability.
+such as 1.3/2 is **not** a probability.
 
 ## ⚡ Two habits that make Jev useful
 
@@ -248,8 +208,6 @@ such as 1.29/2 is **not** a probability.
 
 The general skill and all scenario skills teach these rules. [Context and throughput guide](skills/jev/references/context-and-throughput.md)
 · [Two-record, six-question template](skills/jev/assets/batch-triage.json) (synthetic, not a measured result).
-
-**September 21:** project directory, 18 additional scenarios, setup and safety-evaluation skills. [Intake and validation →](docs/updates/2026-09-21-collection-setup.md)
 
 <a id="projects"></a>
 ## 🧭 Projects, apps, reports & alternatives
@@ -319,7 +277,7 @@ Every scenario stays on this page: copy a task, open its template, change the cr
 | 🛠️ **[Data & developer tools](#data)**<br />12 recipes | 🎨 **[Games & creative tools](#creative)**<br />12 recipes | 🧩 **[Build your own](#building)**<br />4 recipes |
 | 🧰 **[More experiments & red-team workflows](#more-uses)**<br />18 recipes | [📦 Setup](skills/jev-setup/SKILL.md) | [🧪 Evaluation workflows](skills/jev-redteam/SKILL.md) |
 
-**Reading the examples:** 🧪 recorded outputs come from saved API receipts; 🛠 templates are editable inputs, not complete apps; 🎬 community demos belong to their authors. Each scenario states its evidence.
+**Reading the examples:** 🛠 every example is an editable synthetic template, not a saved run. Each scenario states its evidence and review status.
 
 The first complete I/O pair: [stuck-loop recovery ↓](#sc-a02). [How probabilities differ from scores](skills/jev/references/calibration.md).
 
@@ -352,9 +310,9 @@ The first complete I/O pair: [stuck-loop recovery ↓](#sc-a02). [How probabilit
 - **Customize:** Failure window, diagnostic tools and retry limits.
 - **Start:** [jev](skills/jev/SKILL.md) · [Template to adapt](skills/jev/assets/checkpoint.json).
 - **Sources:** [R02](skills/jev/references/community.md#r02) · [P03](skills/jev/references/community.md#p03)
-- **Status:** Synthetic API smoke output shown below; no end-to-end outcome benchmark for this workflow.
+- **Status:** Synthetic request template; this fork records no run for this workflow.
 
-**🧪 Recorded I/O** — CSV parser: the same UnicodeDecodeError twice, no source change between runs.
+**🧪 Request template** — CSV parser: the same UnicodeDecodeError twice, no source change between runs.
 
 **📥 Input · full request**
 
@@ -393,26 +351,6 @@ The first complete I/O pair: [stuck-loop recovery ↓](#sc-a02). [How probabilit
 }
 ```
 
-**📤 Output · observed CLI decisions**
-
-<!-- receipt: examples-2026-09-20.json#checkpoint -->
-```json
-{
-  "next_step": {
-    "status": "selected",
-    "value": "inspect_input",
-    "probability": 1,
-    "margin": 1
-  },
-  "stuck": {
-    "status": "selected",
-    "value": true,
-    "probability": 0.88
-  }
-}
-```
-
-[Original request and full response](evals/results/examples-2026-09-20.json)
 
 <a id="sc-a06"></a>
 <!-- covers: A06 H13 -->
@@ -425,9 +363,9 @@ The first complete I/O pair: [stuck-loop recovery ↓](#sc-a02). [How probabilit
 - **Customize:** Acceptance criteria, receipt freshness and mandatory checks.
 - **Start:** [jev](skills/jev/SKILL.md) · [Template to adapt](skills/jev/assets/completion.json).
 - **Sources:** [P03](skills/jev/references/community.md#p03) · [N01](skills/jev/references/community.md#n01)
-- **Status:** Synthetic API smoke output shown below; no end-to-end outcome benchmark for this workflow.
+- **Status:** Synthetic request template; this fork records no run for this workflow.
 
-**🧪 Recorded I/O** — The job was queued but not executed, the metrics file did not exist, yet the agent claimed completion.
+**🧪 Request template** — The job was queued but not executed, the metrics file did not exist, yet the agent claimed completion.
 
 **📥 Input · full request**
 
@@ -469,26 +407,6 @@ The first complete I/O pair: [stuck-loop recovery ↓](#sc-a02). [How probabilit
 }
 ```
 
-**📤 Output · observed CLI decisions**
-
-<!-- receipt: examples-2026-09-20.json#completion -->
-```json
-{
-  "claim_supported": {
-    "status": "selected",
-    "value": false,
-    "probability": 0.02
-  },
-  "next_step": {
-    "status": "selected",
-    "value": "check_job",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[Original request and full response](evals/results/examples-2026-09-20.json)
 
 **PR merge eligibility:** give the required checks, actual CI receipts and review state; classify `requirements_met`, `missing` or `needs_review`. Code enforces branch protection and permissions; Jev does not merge the PR. Untested workflow adaptation.
 
@@ -548,9 +466,9 @@ The first complete I/O pair: [stuck-loop recovery ↓](#sc-a02). [How probabilit
 - **Customize:** Protected assertions and legitimate test-change exceptions.
 - **Start:** [jev-code-review](skills/jev-code-review/SKILL.md) · [Template to adapt](skills/jev-code-review/assets/example.json).
 - **Sources:** [P03](skills/jev/references/community.md#p03)
-- **Status:** [Live synthetic example](evals/SCENARIO_EXAMPLES.md): test weakening 0.97; not an end-to-end review benchmark.
+- **Status:** the template isolates a weakened assertion; not an end-to-end review benchmark.
 
-**🧪 Recorded I/O** — The assertion was replaced with assert True; only the weakened test was run.
+**🧪 Request template** — The assertion was replaced with assert True; only the weakened test was run.
 
 **📥 Input · full request**
 
@@ -598,30 +516,6 @@ The first complete I/O pair: [stuck-loop recovery ↓](#sc-a02). [How probabilit
 }
 ```
 
-**📤 Output · observed CLI decisions**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-code-review/assets/example.json -->
-```json
-{
-  "weakens_test": {
-    "status": "selected",
-    "value": true,
-    "probability": 0.97
-  },
-  "completion": {
-    "status": "selected",
-    "value": "unsupported",
-    "probability": 1,
-    "margin": 1
-  },
-  "review_priority": {
-    "status": "scored",
-    "value": 1.97
-  }
-}
-```
-
-[Original request and full response](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-a09"></a>
 <!-- covers: A09 -->
@@ -665,10 +559,8 @@ The first complete I/O pair: [stuck-loop recovery ↓](#sc-a02). [How probabilit
 **Try a less obvious failure case:** keep a ticket's facts and correct department
 fixed, then compare clean text, an explicit override, and a forged claim that a
 manager already chose another department. Measure wrong routing and review rates
-separately. In [one author's paired evaluation](docs/updates/2026-09-21.md#decision-failures),
-the explicit override reached the attacker’s target on 1/200 tickets; the forged
-authority claim did so on 147/200. These are external results, not our reproduction
-or a test of the detector above. Typed output does not make a decision injection-proof.
+separately. Typed output does not make a decision injection-proof; run your own red-team
+tests before relying on a detector.
 
 <a id="sc-a12"></a>
 <!-- covers: A12 H12 -->
@@ -792,9 +684,9 @@ or a test of the detector above. Typed output does not make a decision injection
 - **Customize:** Quality floor, latency and model-switch/cache costs.
 - **Start:** [jev-route](skills/jev-route/SKILL.md) · [Template to adapt](skills/jev-route/assets/example.json).
 - **Sources:** [R04](skills/jev/references/community.md#r04) · [R11](skills/jev/references/community.md#r11) · [N04](skills/jev/references/community.md#n04) · [Jev Codex Router](https://github.com/0xNatoshi/jev-codex-router)
-- **Status:** Synthetic API smoke output shown below; no end-to-end outcome benchmark for this workflow.
+- **Status:** Synthetic request template; this fork records no run for this workflow.
 
-**🧪 Recorded I/O** — Explain disagreement between concurrent-write implementations; choices are quick, reasoning and human.
+**🧪 Request template** — Explain disagreement between concurrent-write implementations; choices are quick, reasoning and human.
 
 **📥 Input · full request**
 
@@ -829,21 +721,6 @@ or a test of the detector above. Typed output does not make a decision injection
 }
 ```
 
-**📤 Output · observed CLI decisions**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-route/assets/example.json -->
-```json
-{
-  "route": {
-    "status": "selected",
-    "value": "reasoning",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[Original request and full response](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-a17"></a>
 <!-- covers: A17 -->
@@ -898,9 +775,9 @@ or a test of the detector above. Typed output does not make a decision injection
 - **Customize:** Directory hints, traversal depth and stopping evidence.
 - **Start:** [jev-find-code](skills/jev-find-code/SKILL.md) · [Template to adapt](skills/jev-find-code/assets/example.json).
 - **Sources:** [R12](skills/jev/references/community.md#r12) · [Blink path search](https://github.com/ellipsis-dev/blink)
-- **Status:** Synthetic API smoke output shown below; no end-to-end outcome benchmark for this workflow.
+- **Status:** Synthetic request template; this fork records no run for this workflow.
 
-**🧪 Recorded I/O** — Duplicate invoice investigation: p1 = billing/invoices.py; p2 = ui/theme.py, with supplied summaries.
+**🧪 Request template** — Duplicate invoice investigation: p1 = billing/invoices.py; p2 = ui/theme.py, with supplied summaries.
 
 **📥 Input · full request**
 
@@ -936,21 +813,6 @@ or a test of the detector above. Typed output does not make a decision injection
 }
 ```
 
-**📤 Output · observed CLI decisions**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-find-code/assets/example.json -->
-```json
-{
-  "next_file": {
-    "status": "selected",
-    "value": "p1",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[Original request and full response](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-a21"></a>
 <!-- covers: A21 -->
@@ -963,9 +825,9 @@ or a test of the detector above. Typed output does not make a decision injection
 - **Customize:** False-drop cost, protected errors and raw-output retrieval.
 - **Start:** [jev-context](skills/jev-context/SKILL.md) · [Template to adapt](skills/jev-context/assets/example.json).
 - **Sources:** [R06](skills/jev/references/community.md#r06) · [P02](skills/jev/references/community.md#p02) · [N05](skills/jev/references/community.md#n05) · [winnow / VINNOW lead](https://github.com/GhalebDweikat/winnow)
-- **Status:** [Live synthetic example](evals/SCENARIO_EXAMPLES.md): keep diagnostic block, not theme notes; actual context rewriting untested.
+- **Status:** the template isolates a diagnostic block, not theme notes; actual context rewriting untested.
 
-**🧪 Recorded I/O** — b1 is a quoted-comma parser failure; b2 is color-theme help; investigation is still unfinished.
+**🧪 Request template** — b1 is a quoted-comma parser failure; b2 is color-theme help; investigation is still unfinished.
 
 **📥 Input · full request**
 
@@ -1012,31 +874,6 @@ or a test of the detector above. Typed output does not make a decision injection
 }
 ```
 
-**📤 Output · observed CLI decisions**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-context/assets/example.json -->
-```json
-{
-  "b1_needed": {
-    "status": "selected",
-    "value": true,
-    "probability": 0.91
-  },
-  "b2_needed": {
-    "status": "selected",
-    "value": false,
-    "probability": 0.03
-  },
-  "compact_now": {
-    "status": "selected",
-    "value": "ongoing",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[Original request and full response](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-a22"></a>
 <!-- covers: A22 -->
@@ -1079,9 +916,9 @@ or a test of the detector above. Typed output does not make a decision injection
 - **Customize:** Allowed actions, target conditions and observation freshness.
 - **Start:** [jev-ui](skills/jev-ui/SKILL.md) · [Template to adapt](skills/jev-ui/assets/example.json).
 - **Sources:** [P05](skills/jev/references/community.md#p05) · [Jev Ultrafast](https://github.com/browser-use/jev-ultrafast)
-- **Status:** [Live synthetic example](evals/SCENARIO_EXAMPLES.md): chose `open_policy`; no browser action executed. Ultrafast timing is an author demo.
+- **Status:** the template selects a policy action; no browser action executed. Ultrafast timing is an author demo.
 
-**🧪 Recorded I/O** — Synthetic page: cancellation-policy link e12, pay button e13, photos e14; read-only task.
+**🧪 Request template** — Synthetic page: cancellation-policy link e12, pay button e13, photos e14; read-only task.
 
 **📥 Input · full request**
 
@@ -1129,23 +966,8 @@ or a test of the detector above. Typed output does not make a decision injection
 }
 ```
 
-**📤 Output · observed CLI decisions**
 
-<!-- receipt: examples-2026-09-20.json#browser-route -->
-```json
-{
-  "next_step": {
-    "status": "selected",
-    "value": "read_policy",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[Original request and full response](evals/results/examples-2026-09-20.json)
-
-**🧪 Recorded I/O** — Second synthetic page: policy link e1 and pay button e2; allowed actions are open_policy, wait and blocked.
+**🧪 Request template** — Second synthetic page: policy link e1 and pay button e2; allowed actions are open_policy, wait and blocked.
 
 **📥 Input · full request**
 
@@ -1187,21 +1009,6 @@ or a test of the detector above. Typed output does not make a decision injection
 }
 ```
 
-**📤 Output · observed CLI decisions**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-ui/assets/example.json -->
-```json
-{
-  "action": {
-    "status": "selected",
-    "value": "open_policy",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[Original request and full response](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-a24"></a>
 <!-- covers: A24 -->
@@ -1325,7 +1132,7 @@ or a test of the detector above. Typed output does not make a decision injection
 - **Customize:** App-specific actions, prepared values, stopping points and readback checks.
 - **Start:** [jev-ui](skills/jev-ui/SKILL.md) · [Template to adapt](skills/jev-ui/assets/example.json).
 - **Sources:** [Jev Desktop](https://github.com/yikangy873-gif/jev-desktop) · [Setup notes](skills/jev/references/ecosystem.md)
-- **Status:** Upstream integration samples, not a controlled speedup. Our UI smoke was a synthetic page, not this desktop workflow.
+- **Status:** Upstream integration samples, not a controlled speedup; no desktop smoke recorded in this fork.
 
 **iOS simulator control** uses the same loop: observed accessibility state → permitted control ID → simulator action → fresh observation. [Roundup source](https://x.com/camsoft2000/status/2100648648434434298), not reproduced here.
 
@@ -1370,9 +1177,9 @@ or a test of the detector above. Typed output does not make a decision injection
 - **Customize:** Queue ownership, multi-issue handling and exclusions.
 - **Start:** [jev-triage](skills/jev-triage/SKILL.md) · [Template to adapt](skills/jev-triage/assets/example.json).
 - **Sources:** [P04](skills/jev/references/community.md#p04)
-- **Status:** [Live synthetic example](evals/SCENARIO_EXAMPLES.md): bug queue, urgency 1.29/2; bulk routing untested.
+- **Status:** the template isolates queue plus urgency; bulk routing untested.
 
-**🧪 Recorded I/O** — The same order was charged twice, but checkout still worked; the customer requested review today.
+**🧪 Request template** — The same order was charged twice, but checkout still worked; the customer requested review today.
 
 **📥 Input · full request**
 
@@ -1411,32 +1218,8 @@ or a test of the detector above. Typed output does not make a decision injection
 }
 ```
 
-**📤 Output · observed CLI decisions**
 
-<!-- receipt: examples-2026-09-20.json#triage -->
-```json
-{
-  "category": {
-    "status": "selected",
-    "value": "billing",
-    "probability": 1,
-    "margin": 1
-  },
-  "needs_human": {
-    "status": "selected",
-    "value": true,
-    "probability": 0.91
-  },
-  "urgency": {
-    "status": "scored",
-    "value": 1
-  }
-}
-```
-
-[Original request and full response](evals/results/examples-2026-09-20.json)
-
-**🧪 Recorded I/O** — Export fails for all team members; the monthly report is needed tomorrow.
+**🧪 Request template** — Export fails for all team members; the monthly report is needed tomorrow.
 
 **📥 Input · full request**
 
@@ -1477,25 +1260,6 @@ or a test of the detector above. Typed output does not make a decision injection
 }
 ```
 
-**📤 Output · observed CLI decisions**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-triage/assets/example.json -->
-```json
-{
-  "queue": {
-    "status": "selected",
-    "value": "bug",
-    "probability": 1,
-    "margin": 1
-  },
-  "urgency": {
-    "status": "scored",
-    "value": 1.29
-  }
-}
-```
-
-[Original request and full response](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-h03"></a>
 <!-- covers: H03 -->
@@ -1721,9 +1485,9 @@ or a test of the detector above. Typed output does not make a decision injection
 - **Customize:** Field role, candidate extraction, normalization and no-match behavior.
 - **Start:** [jev-documents](skills/jev-documents/SKILL.md) · [Template to adapt](skills/jev-documents/assets/example.json).
 - **Sources:** [Official span extraction](https://docs.typesafe.ai/cookbooks/pre_parsed_value_extraction_cookbook)
-- **Status:** [Live synthetic example](evals/SCENARIO_EXAMPLES.md): selected s2 (0.97), with a contradicted claim; no OCR/retrieval test.
+- **Status:** the template isolates span selection plus a claim check; no OCR/retrieval test.
 
-**🧪 Recorded I/O** — s1 = general email hello@example.invalid; s2 = invoice email accounts@example.invalid. The claim incorrectly used s1 for invoices.
+**🧪 Request template** — s1 = general email hello@example.invalid; s2 = invoice email accounts@example.invalid. The claim incorrectly used s1 for invoices.
 
 **📥 Input · full request**
 
@@ -1762,27 +1526,6 @@ or a test of the detector above. Typed output does not make a decision injection
 }
 ```
 
-**📤 Output · observed CLI decisions**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-documents/assets/example.json -->
-```json
-{
-  "source": {
-    "status": "selected",
-    "value": "s2",
-    "probability": 0.97,
-    "margin": 0.94
-  },
-  "claim_support": {
-    "status": "selected",
-    "value": "contradicted",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[Original request and full response](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-suitability"></a>
 <!-- covers: M02 -->
@@ -2025,9 +1768,9 @@ or a test of the detector above. Typed output does not make a decision injection
 - **Customize:** Character rubric, goals, action budget and progress measures.
 - **Start:** [jev-simulation](skills/jev-simulation/SKILL.md) · [Template to adapt](skills/jev-simulation/assets/example.json).
 - **Sources:** [R10](skills/jev/references/community.md#r10) · [X01](skills/jev/references/twitter-workflows.md#x01) · [X03](skills/jev/references/twitter-workflows.md#x03) · [R03](skills/jev/references/community.md#r03)
-- **Status:** [Live synthetic example](evals/SCENARIO_EXAMPLES.md): inspect warehouse; no simulator transition or win-rate measurement.
+- **Status:** the template isolates a warehouse inspection; no simulator transition or win-rate measurement.
 
-**🧪 Recorded I/O** — Two days of food, storm-closed bridge, accessible warehouse on the same bank; strategy is to seek local supplies.
+**🧪 Request template** — Two days of food, storm-closed bridge, accessible warehouse on the same bank; strategy is to seek local supplies.
 
 **📥 Input · full request**
 
@@ -2064,21 +1807,6 @@ or a test of the detector above. Typed output does not make a decision injection
 }
 ```
 
-**📤 Output · observed CLI decisions**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev-simulation/assets/example.json -->
-```json
-{
-  "action": {
-    "status": "selected",
-    "value": "inspect_warehouse",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[Original request and full response](evals/results/scenario-smoke-2026-09-20.json)
 
 **Game variants in the supplied roundups:** Doom, 50 concurrent Subway Surfers games, Minecraft, Super Mario and Slay the Spire 2. Translate each game's observed state into legal actions; parallelize independent games, not dependent moves. [Mario's README](https://github.com/fhshaik/typesafe-mario) was inspected: it uses emulator RAM/telemetry, not screenshots. The other game leads and their timing/cost claims are [attributed in the intake ledger](skills/jev/references/intake-2026-09-21.md), not reproduced.
 
@@ -2094,9 +1822,9 @@ or a test of the detector above. Typed output does not make a decision injection
 - **Customize:** Dimensions, observable anchors and discussion goals.
 - **Start:** [jev](skills/jev/SKILL.md) · [Template to adapt](skills/jev/assets/rubric.json).
 - **Sources:** [P10](skills/jev/references/community.md#p10)
-- **Status:** Synthetic API smoke output shown below; no end-to-end outcome benchmark for this workflow.
+- **Status:** Synthetic request template; this fork records no run for this workflow.
 
-**🧪 Recorded I/O** — Offline-first pantry app for busy households; clear audience, but no user or market validation.
+**🧪 Request template** — Offline-first pantry app for busy households; clear audience, but no user or market validation.
 
 **📥 Input · full request**
 
@@ -2132,25 +1860,6 @@ or a test of the detector above. Typed output does not make a decision injection
 }
 ```
 
-**📤 Output · observed CLI decisions**
-
-<!-- receipt: examples-2026-09-20.json#rubric -->
-```json
-{
-  "audience_fit": {
-    "status": "scored",
-    "value": 1.98
-  },
-  "validation": {
-    "status": "selected",
-    "value": "untested",
-    "probability": 1,
-    "margin": 1
-  }
-}
-```
-
-[Original request and full response](evals/results/examples-2026-09-20.json)
 
 <a id="sc-h28"></a>
 <!-- covers: H28 -->
@@ -2182,7 +1891,7 @@ views → `chart` / `table` / `none` → an existing renderer. Batch independent
 presentation questions over the same state; keep deterministic fallbacks and
 essential content outside the gate. The upstream quick start uses a server-side
 TypeSafe key; we have not installed it or tested its thresholds.
-[State, batching and live/replay details](docs/updates/2026-09-21.md#react-views).
+
 
 <a id="sc-reweight"></a>
 <!-- covers: M07 -->
@@ -2230,7 +1939,7 @@ TypeSafe key; we have not installed it or tested its thresholds.
 - **Customize:** Roles, eligibility, interruption rules, turn limits and pause conditions.
 - **Start:** [jev](skills/jev/SKILL.md) · [Template to adapt](skills/jev/assets/voice-style.json).
 - **Sources:** [Multi-chatbot/TTS report](https://x.com/greenhill_pharm/status/2101492328137711891)
-- **Status:** Our joint speaker/style call selected analyst + calm; the full output is shown in the next scenario.
+- **Status:** A joint speaker/style call can select analyst plus calm in one request; no run recorded in this fork.
 
 <a id="sc-tts"></a>
 <!-- covers: M21 U28 -->
@@ -2242,9 +1951,9 @@ TypeSafe key; we have not installed it or tested its thresholds.
 - **Customize:** Style labels, voice mappings, smoothing and neutral fallback.
 - **Start:** [jev](skills/jev/SKILL.md) · [Template to adapt](skills/jev/assets/voice-style.json).
 - **Sources:** [Creator report](https://x.com/greenhill_pharm/status/2101492328137711891)
-- **Status:** [Live synthetic example](evals/SCENARIO_EXAMPLES.md): analyst + calm; no speech generated.
+- **Status:** the template isolates speaker plus style selection; no speech generated.
 
-**🧪 Recorded I/O** — A host invites the analyst to explain conflicting evidence in a fictional podcast; choose speaker and delivery style.
+**🧪 Request template** — A host invites the analyst to explain conflicting evidence in a fictional podcast; choose speaker and delivery style.
 
 **📥 Input · full request**
 
@@ -2288,27 +1997,6 @@ TypeSafe key; we have not installed it or tested its thresholds.
 }
 ```
 
-**📤 Output · observed CLI decisions**
-
-<!-- receipt: scenario-smoke-2026-09-20.json#skills/jev/assets/voice-style.json -->
-```json
-{
-  "speaker": {
-    "status": "selected",
-    "value": "analyst",
-    "probability": 1,
-    "margin": 1
-  },
-  "delivery": {
-    "status": "selected",
-    "value": "calm",
-    "probability": 0.98,
-    "margin": 0.96
-  }
-}
-```
-
-[Original request and full response](evals/results/scenario-smoke-2026-09-20.json)
 
 <a id="sc-negotiation"></a>
 <!-- covers: X06 -->
@@ -2651,10 +2339,8 @@ Data sent for judgment goes to your selected service; use synthetic data first.
 <a id="experiments"></a>
 ## 🧪 Experiments you can inspect
 
-- [Agent before/after](evals/RESULTS.md): 12 pairs, baseline 12/12 vs fixed-checkpoint 10/12. Small negative result for that integration policy.
-- [Decision/calibration pilot](evals/CALIBRATION_RESULTS.md): 136/160 benchmark labels matched; the confidence ≥0.9 group still had 8/100 errors.
-- [Nine scenario API examples](evals/SCENARIO_EXAMPLES.md): observed answers for all eight focused skills plus voice direction; no host actions.
-- [Five earlier live API examples](evals/results/examples-2026-09-20.json): request/response smoke receipts, not scenario-level accuracy tests.
+- [Paired checkpoint pilot harness](evals/README.md): the protocol and runner for a Jev-advice before/after experiment. This fork ships no measured results; run it to produce your own receipts.
+- [Decision/calibration protocol](evals/CALIBRATION.md): the frozen BBH sampling and 0.9/0.7 escalation bands. No calibration numbers are recorded here.
 - [Validation and reproduction](docs/validation.md): package checks, dry runs and untested host boundaries are recorded separately.
 
 ## 🔗 More to explore · Credits

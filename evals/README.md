@@ -6,9 +6,9 @@ For probability calibration and 0.9/0.7 escalation bands, see the separate
 Does bounded Jev advice help **the same base agent** finish verifiable tasks? This
 is a small synthetic experiment, not proof of better long-horizon agents.
 
-**[Published pilot results](RESULTS.md):** 12 paired trials with DeepSeek V4.1 Flash.
-Baseline completed 12/12; fixed Jev checkpoint advice completed 10/12 and added cost.
-All receipts, including failures and unsuccessful provider preflights, are public.
+This fork keeps the harness but **removes the upstream pilot results and
+receipts**: nothing here records a completed measured run. Run the pilot
+yourself to produce your own receipts.
 
 ## Run
 
@@ -43,17 +43,15 @@ or 404 from either model aborts the campaign, preserving partial receipts and an
 `aborted.json` marker. A nonfatal helper failure supplies no advice; it is still
 counted. Malformed successful base responses consume a turn and remain recorded.
 
-### September 20 preflight: no valid comparison
+### Preflight failures are not results
 
-The preserved `results/preflight-2026-09-20` artifacts contain a failed
-infrastructure preflight: all 20 base-model requests failed and no environment
-action was executed. A separate minimal call identified HTTP 403/provider access
-rejection. Three Jev requests succeeded, but this **does not constitute an
-agent before/after result**. The old harness continued to the turn cap and omitted
-HTTP status from receipts; the stop/abort behavior above fixes that. These original
-artifacts are retained unchanged, not presented as evidence of improvement.
+A preflight run whose base-model requests all fail is an infrastructure problem,
+not an agent comparison: no environment action is executed, and any Jev requests
+that succeed still do **not** constitute a before/after result. The stop/abort
+behavior above records such failures as partial receipts instead of continuing to
+the turn cap. This fork ships no preserved preflight artifacts.
 
-## Protocol declared before results
+## Protocol declared before running
 
 - Baseline: `deepseek/deepseek-v4.1-flash`, reasoning `none`, one JSON action per turn.
 - Intervention: the identical agent gets Jev advice before turns 3, 6, and 9.
