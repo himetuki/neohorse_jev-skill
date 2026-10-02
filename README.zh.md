@@ -139,7 +139,7 @@ Agent 应一起修改 `state`、`questions` 和 `criteria`，而不只是替换�
 
 以下命令用于真实 Jev 调用或格式检查；**B 模式由 Agent 直接判断，不用 CLI**。
 
-已安装 `jev-decide` 的话，把下方任一实测的 **Input JSON** 保存成 `request.json`，
+已安装 `jev-decide` 的话，把下方任一 **Input JSON** 保存成 `request.json`，
 按自己的需求改上下文、问题和候选项，然后在该文件所在目录运行：
 
 ```bash
